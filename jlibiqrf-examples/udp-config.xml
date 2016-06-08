@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<udpConfiguration>
+    <communication_type>UDP</communication_type>
+    <localAddress>local</localAddress>
+    <localPort>60</localPort>
+    <remoteAddress>remotr</remoteAddress>
+    <remotePort>80</remotePort>
+    <maxRecvPacketSize>500</maxRecvPacketSize>
+    <receptionTimeout>100</receptionTimeout>
+</udpConfiguration>

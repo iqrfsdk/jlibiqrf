@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: MICRORISC s.r.o.
+Build-Jdk: 1.8.0_65
+Implementation-Title: JLibIQRF
+Implementation-Vendor: MICRORISC s.r.o.
+Implementation-Vendor-Id: com.microrisc.simply
+Implementation-Version: 0
+Specification-Title: JLibIQRF
+Specification-Vendor: MICRORISC s.r.o.
+Specification-Version: 1.0
+Main-Class: com.microrisc.jlibiqrf.examples.WriteRead
