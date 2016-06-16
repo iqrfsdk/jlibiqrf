@@ -16,18 +16,23 @@
 package com.microrisc.jlibiqrf.configuration;
 
 /**
- *  Possible types of IQRF communication in JLibIQRF.
- * 
+ *
  * @author Martin Strouhal
  */
-public enum IQRFCommunicationType {
+public interface XMLConfigurationLoader{
 
-    /** Type for CDC. */
-    CDC,
-    /** Type for SPI. */
-    SPI,
-    /** Type for Serial. */
-    SERIAL,
-    /** Type for UDP. */
-    UDP;
+    /** Loads configuration from specified file.
+     * @param source from which loading configuration
+     * @return loaded configuration
+     * @throws Exception if some error while loading has been occurred
+     */
+    public IQRFConfiguration load(String source);
+    
+    /** Saves specified configuration to file.
+     * @param config to save
+     * @param saveLocation name of file to which will be configuration saved
+     * @throws Exception if some error while saving has been occurred
+     */
+    public void save(IQRFConfiguration config, String saveLocation);
+    
 }

@@ -17,28 +17,38 @@ package com.microrisc.jlibiqrf.iqrfLayer.udp;
 
 import com.microrisc.jlibiqrf.configuration.IQRFCommunicationType;
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
+import com.microrisc.jlibiqrf.iqrfLayer.cdc.CDCConfiguration;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Encapsulates configuration of {@link UDPIQRFLayer}.
  *
  * @author Martin Strouhal
  */
+@XmlRootElement(name = "udpConfiguration")
 public class UDPConfiguration extends IQRFConfiguration {
 
     /** Type specifying {@link CDCConfiguration}. */
     public static final IQRFCommunicationType type = IQRFCommunicationType.UDP;
 
     /** Address of local device. */
+    @XmlElement
     private final String localAddress;
     /** Port of local device. */
+    @XmlElement
     private final int localPort;
     /** Address of remote IQRF device. */
+    @XmlElement
     private final String remoteAddress;
     /** Port of remote IQRF device. */
+    @XmlElement
     private final int remotePort;
     /** Maximum size of received packet. */
+    @XmlElement
     private final int maxRecvPacketSize;
     /** Reception timeout while receiving, 0 is infinity. */
+    @XmlElement
     private final int receptionTimeout;
 
     /**
@@ -53,7 +63,8 @@ public class UDPConfiguration extends IQRFConfiguration {
      * @param receptionTimeout while waiting for receive of data,
      * {@link UDPConfiguration#receptionTimeout}
      */
-    public UDPConfiguration(String localAddress, int localPort, String remoteAddress, int remotePort, int maxRecvPacketSize, int receptionTimeout) {
+    public UDPConfiguration(String localAddress, int localPort, String remoteAddress,
+            int remotePort, int maxRecvPacketSize, int receptionTimeout) {
         super(type);
         this.localAddress = localAddress;
         this.localPort = localPort;
@@ -83,6 +94,13 @@ public class UDPConfiguration extends IQRFConfiguration {
         this.receptionTimeout = UDPIQRFLayer.RECEPTION_TIMEOUT_DEFAULT;
     }
 
+    /** Only for purpose of JAXB. */
+    private UDPConfiguration(){
+        super(type);
+        localAddress = remoteAddress = null;
+        localPort = remotePort = maxRecvPacketSize = receptionTimeout = 0;
+    }
+    
     /**
      * Returns {@link UDPConfiguration#localAddress}. 
      * @return address of local device
@@ -130,4 +148,9 @@ public class UDPConfiguration extends IQRFConfiguration {
     public int getReceptionTimeout() {
         return receptionTimeout;
     }
+
+   @Override
+   public String toString() {
+      return "UDPConfiguration{" + "localAddress=" + localAddress + ", localPort=" + localPort + ", remoteAddress=" + remoteAddress + ", remotePort=" + remotePort + ", maxRecvPacketSize=" + maxRecvPacketSize + ", receptionTimeout=" + receptionTimeout + '}';
+   }
 }

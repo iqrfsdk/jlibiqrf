@@ -1,5 +1,5 @@
 /* 
- * Copyright 2015 MICRORISC s.r.o.
+ * Copyright 2016 MICRORISC s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package com.microrisc.jlibiqrf.configuration;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * Encapsulating configuration of communication for this library. Subclasses can
  * encapsulate next settings of communication depending on the used technology
@@ -22,24 +25,38 @@ package com.microrisc.jlibiqrf.configuration;
  *
  * @author Martin Strouhal
  */
+@XmlRootElement
 public abstract class IQRFConfiguration {
-    
+
+    @XmlElement(name = "communication_type")
     private IQRFCommunicationType type;
-    
+
     /**
-     * Creates abstract of IQRF_Configuration for specified {@link IQRFCommunicationType}.
+     * Creates abstract of IQRF_Configuration for specified
+     * {@link IQRFCommunicationType}.
+     *
      * @param type of used configuration
      */
-    public IQRFConfiguration(IQRFCommunicationType type){
+    public IQRFConfiguration(IQRFCommunicationType type) {
         this.type = type;
     }
-    
+
+    /** Only for purpose of JAXB. */
+    private IQRFConfiguration() {
+    }
+
     /**
      * Returns type of used configuration.
+     *
      * @return {@link IQRFCommunicationType}
      */
-    public IQRFCommunicationType getIQRFCommunicationType(){
+
+    public IQRFCommunicationType getIQRFCommunicationType() {
         return type;
     }
-    
+
+    @Override
+    public String toString() {
+        return "IQRFConfiguration{" + "type=" + type + '}';
+    }
 }

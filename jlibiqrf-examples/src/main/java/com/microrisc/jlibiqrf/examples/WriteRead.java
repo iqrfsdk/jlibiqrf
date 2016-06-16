@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MICRORISC s.r.o.
+ * Copyright 2016 MICRORISC s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,10 @@ package com.microrisc.jlibiqrf.examples;
 import com.microrisc.jlibiqrf.IQRFListener;
 import com.microrisc.jlibiqrf.JLibIQRF;
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
+import com.microrisc.jlibiqrf.iqrfLayer.cdc.CDCConfiguration;
 import com.microrisc.jlibiqrf.iqrfLayer.serial.SerialConfiguration;
+import com.microrisc.jlibiqrf.iqrfLayer.spi.SPIConfiguration;
+import com.microrisc.jlibiqrf.iqrfLayer.udp.UDPConfiguration;
 import com.microrisc.jlibiqrf.types.IQRFError;
 import java.util.Arrays;
 
@@ -34,9 +37,9 @@ public class WriteRead implements IQRFListener {
         // Creating one of possible configurations (depending on used communication type)
         IQRFConfiguration iqrfConfig;
         
-        //iqrfConfig = new CDCConfiguration("COM5");
+        iqrfConfig = new CDCConfiguration("COM5");
         //iqrfConfig = new SPIConfiguration("COM5");
-        iqrfConfig = new SerialConfiguration("COM5", 9600);
+        //iqrfConfig = new SerialConfiguration("COM5", 9600);
         //iqrfConfig = new UDPConfiguration("10.0.0.142", 55000, "10.0.0.139", 55300);
 
         JLibIQRF lib = JLibIQRF.init(iqrfConfig);
@@ -46,7 +49,7 @@ public class WriteRead implements IQRFListener {
         }
 
         // Register listener receiving data from network
-        lib.addActionListener(new WriteRead());
+        lib.addIQRFListener(new WriteRead());
 
         // Send DPA read temperature request
         // NAdr=0x01 0x00 PNum=0x0A PCmd=0x00

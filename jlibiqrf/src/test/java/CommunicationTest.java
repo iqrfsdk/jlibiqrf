@@ -1,14 +1,5 @@
-
-import com.microrisc.jlibiqrf.JLibIQRF;
-import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
-import com.microrisc.jlibiqrf.iqrfLayer.cdc.CDCConfiguration;
-import com.microrisc.jlibiqrf.types.IQRFError;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.microrisc.jlibiqrf.IQRFListener;
-
 /*
- * Copyright 2015 MICRORISC s.r.o.
+ * Copyright 2016 MICRORISC s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +14,26 @@ import com.microrisc.jlibiqrf.IQRFListener;
  * limitations under the License.
  */
 
+import com.microrisc.jlibiqrf.IQRFListener;
+import com.microrisc.jlibiqrf.JLibIQRF;
+import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
+import com.microrisc.jlibiqrf.iqrfLayer.cdc.CDCConfiguration;
+import com.microrisc.jlibiqrf.types.IQRFError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *  Simply test of JLibIQRF
  * 
  * @author Martin Strouhal
  */
-public class Test implements IQRFListener {
+public class CommunicationTest implements IQRFListener {
 
     /** Logger */
-    private static final Logger logger = LoggerFactory.getLogger(Test.class);
+    private static final Logger logger = LoggerFactory.getLogger(CommunicationTest.class);
 
     public static void main(String[] args) throws InterruptedException {
-        //-Djava.library.path=src/main/resources/natives/x64
-        Test test = new Test();
+        CommunicationTest test = new CommunicationTest();
 
         IQRFConfiguration iqrfConfig;
         iqrfConfig = new CDCConfiguration("COM5");

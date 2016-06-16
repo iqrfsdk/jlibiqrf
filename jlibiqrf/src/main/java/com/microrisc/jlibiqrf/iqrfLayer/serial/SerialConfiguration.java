@@ -17,12 +17,15 @@ package com.microrisc.jlibiqrf.iqrfLayer.serial;
 
 import com.microrisc.jlibiqrf.configuration.IQRFCommunicationType;
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Encapsulates configuration of {@link SerialIQRFLayerJssc}.
  *
  * @author Martin Strouhal
  */
+@XmlRootElement(name = "serialConfiguration")
 public class SerialConfiguration extends IQRFConfiguration {
 
     /** Type specifying {@link SerialConfiguration}. */
@@ -30,8 +33,10 @@ public class SerialConfiguration extends IQRFConfiguration {
 
     public static final String PORT_AUTOCONF = "auto";
     /** Port on which communicating device via UART */
+    @XmlElement
     private final String port;
     /** Baudrate of communication */
+    @XmlElement
     private final int baudrate;
 
     /**
@@ -46,6 +51,13 @@ public class SerialConfiguration extends IQRFConfiguration {
         this.baudrate = baudrate;
     }
 
+    /** Only for purpose of JAXB. */
+    private SerialConfiguration() {
+        super(type);
+        port = null;
+        baudrate = 0;
+    }
+
     /**
      * Returns {@link SerialConfiguration#port}.
      *
@@ -57,9 +69,15 @@ public class SerialConfiguration extends IQRFConfiguration {
 
     /**
      * Returns {@link SerialConfiguration#baudrate}.
+     *
      * @return baudrate of communication
      */
     public int getBaudrate() {
         return baudrate;
+    }
+
+    @Override
+    public String toString() {
+        return "SerialConfiguration{" + "port=" + port + ", baudrate=" + baudrate + '}';
     }
 }

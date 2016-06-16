@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MICRORISC s.r.o.
+ * Copyright 2016 MICRORISC s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,15 @@ package com.microrisc.jlibiqrf.iqrfLayer.spi;
 
 import com.microrisc.jlibiqrf.configuration.IQRFCommunicationType;
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Encapsulates configuration of {@link SPIIQRFLayer}.
  *
  * @author Martin Strouhal
  */
+@XmlRootElement(name = "spiConfiguration")
 public class SPIConfiguration extends IQRFConfiguration {
 
     /** Type specifying {@link SPIConfiguration}. */
@@ -30,6 +33,7 @@ public class SPIConfiguration extends IQRFConfiguration {
 
     public static final String PORT_AUTOCONF = "auto";
     /** Name of port on which is processing communication. */
+    @XmlElement
     private final String port;
 
     /**
@@ -42,6 +46,12 @@ public class SPIConfiguration extends IQRFConfiguration {
         this.port = port;
     }
 
+    /** Only for purpose of JAXB. */
+    private SPIConfiguration() {
+        super(type);
+        port = null;
+    }
+
     /**
      * Returns {@link SPIConfiguration#port}.
      *
@@ -49,5 +59,10 @@ public class SPIConfiguration extends IQRFConfiguration {
      */
     public String getPort() {
         return port;
+    }
+
+    @Override
+    public String toString() {
+        return "SPIConfiguration{" + "port=" + port + '}';
     }
 }

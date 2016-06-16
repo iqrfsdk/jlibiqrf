@@ -63,4 +63,9 @@ public enum IQRFError {
     public static String getDescription(int errorId){
         return map.get(errorId).description;
     }
+
+   @Override
+   public String toString() {
+      return "IQRFError{" + "errorId=" + errorId + ", description=" + description + '}';
+   }
 }

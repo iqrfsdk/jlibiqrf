@@ -1,5 +1,5 @@
 /* 
- * Copyright 2015 MICRORISC s.r.o.
+ * Copyright 2016 MICRORISC s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -325,4 +325,9 @@ public final class SPIIQRFLayer extends AbstractIQRFLayer {
         logger.info("Destroyed SPI IQRF layer.");
         logger.debug("destroy - end");
     }
+
+   @Override
+   public String toString() {
+      return "SPIIQRFLayer{" + "spiReader=" + spiReader + ", listenerCaller=" + listenerCaller + ", spiMaster=" + spiMaster + ", portName=" + portName + ", dataFromSPI=" + dataFromSPI + ", spiSynchro=" + spiSynchro + ", threadsSynchro=" + threadsSynchro + ", maxRecvPacketSize=" + maxRecvPacketSize + ", MAX_SENDING_ATTEMPT_COUNT=" + MAX_SENDING_ATTEMPT_COUNT + ", UNSUCCESSFUL_SENDING_TIMEOUT=" + UNSUCCESSFUL_SENDING_TIMEOUT + '}';
+   }
 }

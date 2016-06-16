@@ -1,5 +1,5 @@
 /* 
- * Copyright 2015 MICRORISC s.r.o.
+ * Copyright 2016 MICRORISC s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -412,4 +412,9 @@ public final class SerialIQRFLayerJssc extends AbstractIQRFLayer {
         logger.info("Destroyed");
         logger.debug("destroy - end");
     }
+
+   @Override
+   public String toString() {
+      return "SerialIQRFLayerJssc{" + "listenerCaller=" + listenerCaller + ", serialPort=" + serialPort + ", portName=" + portName + ", serialBaudrate=" + serialBaudrate + ", dataFromSerial=" + dataFromSerial + ", threadsSynchro=" + threadsSynchro + '}';
+   }
 }
