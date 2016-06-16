@@ -22,6 +22,7 @@ import com.microrisc.jlibiqrf.iqrfLayer.cdc.CDCConfiguration;
 import com.microrisc.jlibiqrf.iqrfLayer.serial.SerialConfiguration;
 import com.microrisc.jlibiqrf.iqrfLayer.spi.SPIConfiguration;
 import com.microrisc.jlibiqrf.iqrfLayer.udp.UDPConfiguration;
+import java.io.File;
 
 /**
  * Test of working with configuration.
@@ -32,21 +33,40 @@ public class ConfigurationTest {
     public static void main(String[] args) {
         IQRFConfiguration config;
         
+        // creating UDP config
         config = new UDPConfiguration("local", 60, "remotr", 80);
-        SimpleXMLConfigurationLoader.getInstance().save(config, "udp-config.xml");
+        // saving config
+        SimpleXMLConfigurationLoader.getInstance().save(config, 
+                "config" + File.separator + "udp-config.xml");
         System.out.println("UDP configuration saved.");
         
+        // creating SPI config
         config = new SPIConfiguration("COM5");
-        SimpleXMLConfigurationLoader.getInstance().save(config, "spi-config.xml");
+        // saving config
+        SimpleXMLConfigurationLoader.getInstance().save(config, 
+                "config" + File.separator + "spi-config.xml");
         System.out.println("SPI configuration saved.");
         
+        // creating CDC config
         config = new CDCConfiguration("COM5");
-        SimpleXMLConfigurationLoader.getInstance().save(config, "cdc-config.xml");
+        // saving config
+        SimpleXMLConfigurationLoader.getInstance().save(config, 
+                "config" + File.separator + "cdc-config.xml");
         System.out.println("CDC configuration saved.");
         
+        // creating Serial config
         config = new SerialConfiguration("COM5", 9600);
-        SimpleXMLConfigurationLoader.getInstance().save(config, "serial-config.xml");
+        // saving config
+        SimpleXMLConfigurationLoader.getInstance().save(config, 
+                "config" + File.separator + "serial-config.xml");
         System.out.println("Serial configuration saved.");
+        
+        
+        // loading config
+        config = SimpleXMLConfigurationLoader.getInstance().load(
+                "config" + File.separator + "serial-config.xml");
 
+        // printing config
+        System.out.println("\nLoaded config: " + config);
     }
 }
