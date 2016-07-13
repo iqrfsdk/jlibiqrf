@@ -26,10 +26,11 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 /**
- *
+ *  Provides loading and saving of configuration from / to file.
+ * 
  * @author Martin Strouhal
  */
-public class SimpleXMLConfigurationLoader implements XMLConfigurationLoader {
+public class SimpleXMLConfigurationLoader implements XMLConfigurationLoader<String, String> {
 
     private static final Class[] configurationObjects = new Class[]{
         IQRFConfiguration.class, SPIConfiguration.class, CDCConfiguration.class,
@@ -44,6 +45,9 @@ public class SimpleXMLConfigurationLoader implements XMLConfigurationLoader {
         return instance;
     }
 
+    /**
+     * @param source is name of file from which will be configuration loaded
+     */
     @Override
     public IQRFConfiguration load(String source) {
         try {

@@ -16,23 +16,29 @@
 package com.microrisc.jlibiqrf.configuration;
 
 /**
+ * Provides interface for loading of {@link IQRFConfiguration}
+ *
+ * @param <LoadingObject> from which will be config loaded
+ * @param <SavingObject> into which will be config saved
  *
  * @author Martin Strouhal
  */
-public interface XMLConfigurationLoader{
+public interface XMLConfigurationLoader<LoadingObject, SavingObject> {
 
-    /** Loads configuration from specified file.
-     * @param source from which loading configuration
+    /** Loads configuration.
+     *
+     * @param source from which is configuration loading
      * @return loaded configuration
      * @throws Exception if some error while loading has been occurred
      */
-    public IQRFConfiguration load(String source);
-    
-    /** Saves specified configuration to file.
+    public IQRFConfiguration load(LoadingObject source);
+
+    /** Saves configuration.
+     *
      * @param config to save
-     * @param saveLocation name of file to which will be configuration saved
+     * @param saveLocation location to which will be configuration saved
      * @throws Exception if some error while saving has been occurred
      */
-    public void save(IQRFConfiguration config, String saveLocation);
-    
+    public void save(IQRFConfiguration config, SavingObject saveLocation);
+
 }
