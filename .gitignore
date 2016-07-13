@@ -13,3 +13,6 @@ hs_err_pid*
 /jlibiqrf/target/
 /jlibiqrf-examples/target/
 /jlibiqrf-demos/target/
+/jlibiqrf-modules/jlibiqrf/target
+/jlibiqrf-modules/jlibiqrf-examples/target
+/jlibiqrf-modules/jlibiqrf-demos/target
