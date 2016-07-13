@@ -20,7 +20,7 @@ package com.microrisc.jlibiqrf.demos.config;
  *
  * @author Martin Strouhal
  */
-public interface XMLConfigurationLoader {
+public interface BridgeConfigurationLoader {
 
     /**
      * Loads configuration from file with specified path.

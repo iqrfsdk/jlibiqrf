@@ -1,7 +1,6 @@
-
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
+import com.microrisc.jlibiqrf.demos.config.SimpleBridgeConfigurationLoader;
 import com.microrisc.jlibiqrf.demos.config.BridgeConfiguration;
-import com.microrisc.jlibiqrf.demos.config.SimpleXMLConfigurationLoader;
 import com.microrisc.jlibiqrf.iqrfLayer.cdc.CDCConfiguration;
 
 /*
@@ -43,12 +42,12 @@ public class Configuration {
         
         System.out.println("-------------------------------------------------");
         
-        SimpleXMLConfigurationLoader.getInstance().saveBridgeConfiguration(
-                config, "config.xml");
+        SimpleBridgeConfigurationLoader.getInstance().saveBridgeConfiguration(
+                config, "src/config/config.xml");
 
         System.out.println("-------------------------------------------------");
         
-        config = SimpleXMLConfigurationLoader.getInstance().load("config.xml");
+        config = SimpleBridgeConfigurationLoader.getInstance().load("src/config/config.xml");
         System.out.println("after: " + config.toString());
         
         System.out.println("end");

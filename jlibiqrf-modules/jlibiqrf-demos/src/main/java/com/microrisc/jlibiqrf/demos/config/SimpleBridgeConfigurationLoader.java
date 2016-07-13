@@ -22,17 +22,17 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 /**
- * Implements {@link XMLConfigurationLoader}.
+ * Implements {@link BridgeConfigurationLoader}.
  * 
  * @author Martin Strouhal
  */
-public class SimpleXMLConfigurationLoader implements XMLConfigurationLoader{
+public class SimpleBridgeConfigurationLoader implements BridgeConfigurationLoader{
 
-    private static final SimpleXMLConfigurationLoader instance = new SimpleXMLConfigurationLoader();
+    private static final SimpleBridgeConfigurationLoader instance = new SimpleBridgeConfigurationLoader();
     
-    private SimpleXMLConfigurationLoader(){}
+    private SimpleBridgeConfigurationLoader(){}
     
-    public static SimpleXMLConfigurationLoader getInstance(){
+    public static SimpleBridgeConfigurationLoader getInstance(){
         return instance;
     }
     

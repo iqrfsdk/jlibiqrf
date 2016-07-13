@@ -15,6 +15,7 @@
  */
 package com.microrisc.jlibiqrf.demos;
 
+import com.microrisc.jlibiqrf.demos.config.BridgeConfiguration;
 import com.microrisc.jlibiqrf.demos.iqrf.IQRFCommunicator;
 import com.microrisc.jlibiqrf.demos.json.SimpleJsonConvertor;
 import com.microrisc.jlibiqrf.demos.mqtt.MQTTCommunicator;
@@ -37,33 +38,22 @@ public class Bridge {
     private final Queue<MqttMessage> mqttMessages;
     // queue for data from IQRF network
     private final Queue<short[]> iqrfData;
-    private final static LinkedList<String> topics = new LinkedList<>(
-            Arrays.asList(new String[]{"coordinator-mid/dpa/requests", 
-             /*   "coordinator-mid/dpa/confirmations", "coordinator-mid/dpa/responses"*/
-            }));
-
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws Exception {
-        Bridge logic = new Bridge();
-        //Thread.sleep(5000);
-        //   logic.addIQRFData(new short[]{0x00, 0x01, 0x06, 0x84, 0xFF, 0xFF});
-    }
-    
-    public Bridge(){
+    public Bridge(BridgeConfiguration config){
+        log.debug("Bridge - init - start: config={}", config);
         mqttMessages = new LinkedList<>();
         iqrfData = new LinkedList<>();
         
         IQRFCommunicator iqrfCom = new IQRFCommunicator(this);
         iqrfCom.init();
         
-        MQTTCommunicator mqttCom = new MQTTCommunicator("4c774931de1c4e54b27e186eff89ba56",
-                "tcp://192.168.153.2:1883", topics, this);
+        MQTTCommunicator mqttCom = new MQTTCommunicator(
+                config.getClientId(),
+                config.getCompleteAddress(),
+                Arrays.asList(config.getSubscribedTopics()), this);
         mqttCom.connect();
-        mqttCom.checkAndPublishDeviceData(1000);
-        
+        mqttCom.checkAndPublishDeviceData(config.getCheckingInterval());
+        log.debug("Bridge - init - end");
     }
 
     public void addIQRFData(short[] data) {
