@@ -13,28 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.microrisc.jlibiqrf.demos.json;
+package com.microrisc.jlibiqrf.demos.config;
 
 /**
- * Provides converting IQRF data to json and vice versa.
+ * Provides loading and saving of {@link BridgeConfiguration}.
  *
  * @author Martin Strouhal
  */
-public interface JsonConvertor {
+public interface XMLConfigurationLoader {
 
-    /** Converts string with json data to IQRF data which can be send into IQRF.
-     * network.
+    /**
+     * Loads configuration from file with specified path.
      *
-     * @param json object is with data formatted as json
-     * @return short array with individual bytes of IQRF data
+     * @param path of file form which will be configuration loaded
+     * @return loaded config as {@link BridgeConfiguration}
      */
-    short[] toIQRF(Object json);
+    public BridgeConfiguration load(String path);
 
-    /** Converts IQRF data from IQRF network into string with json data.
+    /**
+     * Saves specified configuration to file with specified path.
      *
-     * @param iqrf is short array with individual bytes of IQRF data
-     * @return object with data formatted as json
+     * @param config to save
+     * @param path of file to which will be config saved
      */
-    Object toJson(short[] iqrf);
-    
+    public void saveBridgeConfiguration(BridgeConfiguration config, String path);
+
 }

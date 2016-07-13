@@ -16,7 +16,7 @@
 
 package com.microrisc.jlibiqrf.demos.mqtt;
 
-import com.microrisc.jlibiqrf.demos.AppLogic;
+import com.microrisc.jlibiqrf.demos.Bridge;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -39,7 +39,7 @@ public class MQTTCommunicator extends MQTTCommunicationHandler {
     
     private ScheduledExecutorService service = Executors.newScheduledThreadPool(2);
     private ScheduledFuture<?> dataPushServiceHandler;
-    private AppLogic appLogic;
+    private Bridge appLogic;
     
     /** Creates instance of {@link MQTTCommunicator}.
      * 
@@ -49,7 +49,7 @@ public class MQTTCommunicator extends MQTTCommunicationHandler {
      * @param logic which us used for central communication
      */
     public MQTTCommunicator(String clientId, String mqttBrokerEndPoint, 
-            List<String> subscribeTopics, AppLogic logic
+            List<String> subscribeTopics, Bridge logic
     ) {
         super(clientId, mqttBrokerEndPoint, subscribeTopics);
         appLogic = logic;
@@ -109,7 +109,7 @@ public class MQTTCommunicator extends MQTTCommunicationHandler {
                     System.out.println("msg: " + msg);
                     
                     // publish data
-                    publishDeviceData("coordinator-mid/dpa/requests", new String(msg.getPayload()));
+                    publishDeviceData("coordinator-mid/dpa/responses", new String(msg.getPayload()));
                     
                     log.debug("Data published");
                 }
@@ -182,6 +182,6 @@ public class MQTTCommunicator extends MQTTCommunicationHandler {
         Thread terminatorThread = new Thread(stopConnection);
         terminatorThread.setName("TerminatorThread");
         terminatorThread.setDaemon(true);
-        terminatorThread.start();
+     //   terminatorThread.start();
     }
 }

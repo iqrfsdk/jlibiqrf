@@ -288,6 +288,7 @@ public abstract class MQTTCommunicationHandler implements MqttCallback, Communic
         };
         reconnectThread.setDaemon(true);
         reconnectThread.start();
+        connect();
     }
         
     /**

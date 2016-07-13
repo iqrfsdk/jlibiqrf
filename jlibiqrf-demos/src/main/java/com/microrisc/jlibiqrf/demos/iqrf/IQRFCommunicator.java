@@ -1,13 +1,23 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2016 MICRORISC s.r.o.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.microrisc.jlibiqrf.demos.iqrf;
 
 import com.microrisc.jlibiqrf.IQRFListener;
 import com.microrisc.jlibiqrf.JLibIQRF;
-import com.microrisc.jlibiqrf.demos.AppLogic;
+import com.microrisc.jlibiqrf.demos.Bridge;
 import com.microrisc.jlibiqrf.iqrfLayer.cdc.CDCConfiguration;
 import java.util.Arrays;
 import org.slf4j.Logger;
@@ -21,7 +31,7 @@ public class IQRFCommunicator implements IQRFListener {
 
     private static final Logger log = LoggerFactory.getLogger(IQRFCommunicator.class);
     
-    private AppLogic appLogic;
+    private Bridge appLogic;
     private JLibIQRF iqrfLib;
     private CommunicatingThread comThread;
     
@@ -29,7 +39,7 @@ public class IQRFCommunicator implements IQRFListener {
      * 
      * @param logic which will be used for communication
      */
-    public IQRFCommunicator(AppLogic logic) {
+    public IQRFCommunicator(Bridge logic) {
         appLogic = logic;
     }
 
