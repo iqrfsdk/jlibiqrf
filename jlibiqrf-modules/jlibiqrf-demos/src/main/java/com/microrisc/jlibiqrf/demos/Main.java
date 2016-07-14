@@ -25,7 +25,8 @@ import com.microrisc.jlibiqrf.demos.config.SimpleBridgeConfigurationLoader;
 public class Main {
     
     public static void main(String[] args) {
-        BridgeConfiguration config = SimpleBridgeConfigurationLoader.getInstance().load("src/config/config.xml");
+        //BridgeConfiguration config = SimpleBridgeConfigurationLoader.getInstance().load("src/config/config.xml");
+        BridgeConfiguration config = SimpleBridgeConfigurationLoader.getInstance().load(args[0]);
         System.out.println("Loaded config: " + config.toString());
         
         Bridge bridge = new Bridge(config);
