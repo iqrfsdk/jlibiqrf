@@ -42,13 +42,20 @@ public class Configuration {
         
         System.out.println("-------------------------------------------------");
         
-    //    SimpleBridgeConfigurationLoader.getInstance().saveBridgeConfiguration(
-    //            config, "src/config/config2.xml");
+        //  SimpleBridgeConfigurationLoader.getInstance().saveBridgeConfiguration(
+        //        config, "src/config/config.xml");
 
         System.out.println("-------------------------------------------------");
         
         config = SimpleBridgeConfigurationLoader.getInstance().load("src/config/config.xml");
         System.out.println("after: " + config.toString());
+        
+        System.out.println(config);
+        
+        System.out.println("-------------------------------------------------");
+        
+        SimpleBridgeConfigurationLoader.getInstance().saveBridgeConfiguration(
+                config, "src/config/config.xml");
         
         System.out.println("end");
     }

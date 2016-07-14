@@ -23,7 +23,7 @@ package com.microrisc.jlibiqrf.configuration;
  *
  * @author Martin Strouhal
  */
-public interface XMLConfigurationLoader<LoadingObject, SavingObject> {
+public interface IQRFConfigurationLoader<LoadingObject, SavingObject> {
 
     /** Loads configuration.
      *

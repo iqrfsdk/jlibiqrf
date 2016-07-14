@@ -16,16 +16,16 @@
 package com.microrisc.jlibiqrf.demos.config;
 
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
-import com.microrisc.jlibiqrf.configuration.SimpleXMLConfigurationLoader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.nio.charset.Charset;
+import com.microrisc.jlibiqrf.configuration.SimpleIQRFConfigurationLoader;
+import java.text.SimpleDateFormat;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Adapter for parsing filename of {@link IQRFConfiguration} and its loading and 
+ * its saving too.
+ * 
  * @author Martin Strouhal
  */
 public class IQRFConfigurationAdapter extends XmlAdapter<String, IQRFConfiguration> {
@@ -35,13 +35,8 @@ public class IQRFConfigurationAdapter extends XmlAdapter<String, IQRFConfigurati
     @Override
     public IQRFConfiguration unmarshal(String xmlText) throws Exception {
         log.debug("unmarshal - start: xmlText={}", xmlText);
-//        PipedInputStream input = new PipedInputStream();
-//        PipedOutputStream output = new PipedOutputStream(input);
-//        output.write(xmlText.getBytes(Charset.forName("utf-8")), 0, xmlText.length());
-//        output.flush();
-//        output.close();
-        IQRFConfiguration config = SimpleXMLConfigurationLoader.getInstance().load(xmlText);
-//        input.close();
+        IQRFConfiguration config = SimpleIQRFConfigurationLoader.getInstance().load(xmlText);
+        config.setSavingLocation(xmlText);
         log.debug("unmarshal - end: " + config);
         return config;
     }
@@ -49,18 +44,21 @@ public class IQRFConfigurationAdapter extends XmlAdapter<String, IQRFConfigurati
     @Override
     public String marshal(IQRFConfiguration config) throws Exception {
         log.debug("marshal - start: config={}", config);
-        PipedInputStream input = new PipedInputStream();
-        PipedOutputStream output = new PipedOutputStream(input);
-        IQRFConfigurationLoader.getInstance().save(config, output);
+        String savingLocation;
+        if(config.getSavingLocation() != null)
+            savingLocation = config.getSavingLocation();
+        else
+            savingLocation = getConfigName();
         
-        output.close();
-        byte[] textAsBytes = new byte[input.available()];
-        input.read(textAsBytes);
-        input.close();
-        
-        String xmlText = new String(textAsBytes, Charset.forName("utf-8"));
-        
-        log.debug("marshal - end: " + xmlText);
-        return xmlText;    
+        SimpleIQRFConfigurationLoader.getInstance().save(config, savingLocation);
+            
+        log.debug("marshal - end: " + savingLocation);
+        return savingLocation;    
+    }
+    
+    private String getConfigName(){
+        SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS");
+        String time = timeFormat.format(System.currentTimeMillis());
+        return "config-" + time;
     }
 }

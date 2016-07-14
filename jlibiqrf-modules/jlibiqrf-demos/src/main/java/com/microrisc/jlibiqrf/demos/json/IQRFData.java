@@ -16,11 +16,17 @@
 package com.microrisc.jlibiqrf.demos.json;
 
 /**
- *
+ * Provides access to IQRF data in short array form.
+ * 
  * @author Martin Strouhal
  */
 interface IQRFData {
     
+    /**
+     * Returns IQRF data as short array.
+     * 
+     * @return IQRF data
+     */
     public short[] getIQRFData();
     
 }

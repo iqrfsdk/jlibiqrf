@@ -31,17 +31,17 @@ final class JsonIQRFData implements IQRFData {
     private short command;
     @JsonProperty("hwpid")
     private int hardwareProfiles;
-    //@JsonProperty("data")
+    @JsonProperty("data")
     private short[] data;
 
     @Override
     public short[] getIQRFData() {
-        short[] result = new short[6 /*+ data.length*/];
+        short[] result = new short[6 + data.length];
         result = saveIntToShort(result, 0, address);
         result[2] = peripheral;
         result[3] = command;
         result = saveIntToShort(result, 4, hardwareProfiles);
-        //System.arraycopy(data, 0, result, 6, data.length);
+        System.arraycopy(data, 0, result, 6, data.length);
         return result;
     }
 

@@ -22,11 +22,13 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 /**
- * Implements {@link BridgeConfigurationLoader}.
+ * Implements {@link BridgeConfigurationLoader} for loading and saving 
+ * configuration from / into file.
  * 
  * @author Martin Strouhal
  */
-public class SimpleBridgeConfigurationLoader implements BridgeConfigurationLoader{
+public class SimpleBridgeConfigurationLoader implements 
+        BridgeConfigurationLoader<String, String> {
 
     private static final SimpleBridgeConfigurationLoader instance = new SimpleBridgeConfigurationLoader();
     

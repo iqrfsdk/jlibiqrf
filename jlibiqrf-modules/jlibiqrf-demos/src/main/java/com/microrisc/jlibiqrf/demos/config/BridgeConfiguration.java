@@ -16,20 +16,21 @@
 package com.microrisc.jlibiqrf.demos.config;
 
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
-import com.microrisc.jlibiqrf.configuration.SimpleXMLConfigurationLoader;
+import com.microrisc.jlibiqrf.configuration.SimpleIQRFConfigurationLoader;
 import com.microrisc.jlibiqrf.demos.json.SimpleJsonConvertor;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
- *
+ * Encapsulates configuration of {@link Bridge}.
+ * 
  * @author Martin Strouhal
  */
 @XmlRootElement(name = "Bridge_configuration")
 public final class BridgeConfiguration {
 
-    @XmlElement(name = "IQRF_config")
+    @XmlElement(name = "IQRF_config_path")
     @XmlJavaTypeAdapter(IQRFConfigurationAdapter.class)
     private final IQRFConfiguration iqrfConfig;
     @XmlElement(name = "Client_id")
@@ -56,6 +57,7 @@ public final class BridgeConfiguration {
         jsonConvertor = null;
     }
     
+    /** For ConfigurationBuilder only */
     private BridgeConfiguration(ConfigurationBuilder builder) {
         this.iqrfConfig = builder.iqrfConfig;
         this.clientId = builder.clientId;
@@ -127,7 +129,7 @@ public final class BridgeConfiguration {
         
         public ConfigurationBuilder(String mqttBrokerAddress, String config){
             this.mqttBrokerAddress = mqttBrokerAddress;
-            this.iqrfConfig = SimpleXMLConfigurationLoader.getInstance().load(config);
+            this.iqrfConfig = SimpleIQRFConfigurationLoader.getInstance().load(config);
         }
         
         public ConfigurationBuilder(String mqttBrokerAddress, IQRFConfiguration config){

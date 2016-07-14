@@ -20,22 +20,22 @@ package com.microrisc.jlibiqrf.demos.config;
  *
  * @author Martin Strouhal
  */
-public interface BridgeConfigurationLoader {
+public interface BridgeConfigurationLoader<LoadingObject, SavingObject> {
 
     /**
      * Loads configuration from file with specified path.
      *
-     * @param path of file form which will be configuration loaded
-     * @return loaded config as {@link BridgeConfiguration}
+     * @param loadingObj is resource from which will be configuration loaded
+     * @return loaded configuration as {@link BridgeConfiguration}
      */
-    public BridgeConfiguration load(String path);
+    public BridgeConfiguration load(LoadingObject loadingObj);
 
     /**
      * Saves specified configuration to file with specified path.
      *
      * @param config to save
-     * @param path of file to which will be config saved
+     * @param savingObj is resource into which will be configuration saved
      */
-    public void saveBridgeConfiguration(BridgeConfiguration config, String path);
+    public void saveBridgeConfiguration(BridgeConfiguration config, SavingObject savingObj);
 
 }

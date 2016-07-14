@@ -30,6 +30,7 @@ public abstract class IQRFConfiguration {
 
     @XmlElement(name = "communication_type")
     private IQRFCommunicationType type;
+    protected String savingLocation;
 
     /**
      * Creates abstract of IQRF_Configuration for specified
@@ -55,8 +56,17 @@ public abstract class IQRFConfiguration {
         return type;
     }
 
+    public String getSavingLocation() {
+        return savingLocation;
+    }
+
+    public void setSavingLocation(String savingLocation) {
+        this.savingLocation = savingLocation;
+    }
+
     @Override
     public String toString() {
-        return "IQRFConfiguration{" + "type=" + type + '}';
+        return "IQRFConfiguration{" + "type=" + type + ", savingLocation=" + savingLocation + '}';
     }
+
 }

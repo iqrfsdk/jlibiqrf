@@ -13,48 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.microrisc.jlibiqrf.demos.config;
+package com.microrisc.jlibiqrf.configuration;
 
-import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
 import com.microrisc.jlibiqrf.iqrfLayer.cdc.CDCConfiguration;
 import com.microrisc.jlibiqrf.iqrfLayer.serial.SerialConfiguration;
 import com.microrisc.jlibiqrf.iqrfLayer.spi.SPIConfiguration;
 import com.microrisc.jlibiqrf.iqrfLayer.udp.UDPConfiguration;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.File;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 /**
- *
+ * Provides loading and saving of configuration from / to file.
+ * 
  * @author Martin Strouhal
  */
-final class IQRFConfigurationLoader implements
-        com.microrisc.jlibiqrf.configuration.XMLConfigurationLoader<PipedInputStream, PipedOutputStream> {
+public class SimpleIQRFConfigurationLoader implements IQRFConfigurationLoader<String, String> {
 
     private static final Class[] configurationObjects = new Class[]{
         IQRFConfiguration.class, SPIConfiguration.class, CDCConfiguration.class,
         SerialConfiguration.class, UDPConfiguration.class};
 
-    private static IQRFConfigurationLoader instance = new IQRFConfigurationLoader();
+    private static SimpleIQRFConfigurationLoader instance = new SimpleIQRFConfigurationLoader();
 
-    private IQRFConfigurationLoader() {
+    private SimpleIQRFConfigurationLoader() {
     }
 
-    public static IQRFConfigurationLoader getInstance() {
+    public static SimpleIQRFConfigurationLoader getInstance() {
         return instance;
     }
-    
-    @Override
-    public IQRFConfiguration load(PipedInputStream source) {
 
+    /**
+     * @param source is name of file from which will be configuration loaded
+     */
+    @Override
+    public IQRFConfiguration load(String source) {
         try {
+
+            File file = new File(source);
             JAXBContext jaxbContext = JAXBContext.newInstance(configurationObjects);
 
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            IQRFConfiguration config = (IQRFConfiguration) jaxbUnmarshaller.unmarshal(source);
+            IQRFConfiguration config = (IQRFConfiguration) jaxbUnmarshaller.unmarshal(file);
             return config;
 
         } catch (JAXBException e) {
@@ -64,8 +66,9 @@ final class IQRFConfigurationLoader implements
     }
 
     @Override
-    public void save(IQRFConfiguration config, PipedOutputStream saveLocation) {
+    public void save(IQRFConfiguration config, String saveLocation) {
         try {
+            File file = new File(saveLocation);
             Class implementedClass = null;
             switch (config.getIQRFCommunicationType()) {
                 case CDC:
@@ -86,17 +89,12 @@ final class IQRFConfigurationLoader implements
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
-            
-            System.out.println("debug ----");
-            jaxbMarshaller.marshal(config, System.out);
-            System.out.println("--- debug");
-            
-            jaxbMarshaller.marshal(config, saveLocation);
+
+            jaxbMarshaller.marshal(config, file);
 
         } catch (JAXBException e) {
             e.printStackTrace();
             throw new RuntimeException("Configuration cannot be saved: " + e);
         }
-    }   
+    }
 }
