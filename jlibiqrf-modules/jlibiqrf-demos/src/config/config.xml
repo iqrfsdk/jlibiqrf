@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Bridge_configuration>
-    <IQRF_config>
-        <cdcConfiguration>
-            <communication_type>CDC</communication_type>
-            <port>COM5</port>
-        </cdcConfiguration>
-    </IQRF_config>
+    <IQRF_config>src/config/cdc-config.xml</IQRF_config>
     <Client_id>clientsid</Client_id>
+    <MQTT_broker_protocol>tcp</MQTT_broker_protocol>
     <MQTT_broker_address>192.168.154.4</MQTT_broker_address>
     <MQTT_broker_port>1833</MQTT_broker_port>
     <Checking_interval>1000</Checking_interval>

@@ -42,8 +42,8 @@ public class Configuration {
         
         System.out.println("-------------------------------------------------");
         
-        SimpleBridgeConfigurationLoader.getInstance().saveBridgeConfiguration(
-                config, "src/config/config.xml");
+    //    SimpleBridgeConfigurationLoader.getInstance().saveBridgeConfiguration(
+    //            config, "src/config/config2.xml");
 
         System.out.println("-------------------------------------------------");
         

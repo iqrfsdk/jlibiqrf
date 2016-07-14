@@ -16,6 +16,7 @@
 package com.microrisc.jlibiqrf.demos.config;
 
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
+import com.microrisc.jlibiqrf.configuration.SimpleXMLConfigurationLoader;
 import com.microrisc.jlibiqrf.demos.json.SimpleJsonConvertor;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -123,6 +124,11 @@ public final class BridgeConfiguration {
         private int checkingInterval = DEFAULT_CHECKING_INTERVAL;
         private String[] subscribedTopics = DEFAULT_SUBSCRIBED_TOPICS;
         private Class jsonConvertor = DEFAULT_JSON_CONVERTOR;
+        
+        public ConfigurationBuilder(String mqttBrokerAddress, String config){
+            this.mqttBrokerAddress = mqttBrokerAddress;
+            this.iqrfConfig = SimpleXMLConfigurationLoader.getInstance().load(config);
+        }
         
         public ConfigurationBuilder(String mqttBrokerAddress, IQRFConfiguration config){
             this.mqttBrokerAddress = mqttBrokerAddress;

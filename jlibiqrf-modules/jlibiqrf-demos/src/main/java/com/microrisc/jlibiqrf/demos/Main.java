@@ -29,6 +29,7 @@ public class Main {
         System.out.println("Loaded config: " + config.toString());
         
         Bridge bridge = new Bridge(config);
+        System.out.println("Bridge started");
     }
     
 }

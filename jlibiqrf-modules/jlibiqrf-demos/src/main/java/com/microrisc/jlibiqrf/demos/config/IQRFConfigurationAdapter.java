@@ -16,6 +16,7 @@
 package com.microrisc.jlibiqrf.demos.config;
 
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
+import com.microrisc.jlibiqrf.configuration.SimpleXMLConfigurationLoader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.nio.charset.Charset;
@@ -34,13 +35,13 @@ public class IQRFConfigurationAdapter extends XmlAdapter<String, IQRFConfigurati
     @Override
     public IQRFConfiguration unmarshal(String xmlText) throws Exception {
         log.debug("unmarshal - start: xmlText={}", xmlText);
-        PipedInputStream input = new PipedInputStream();
-        PipedOutputStream output = new PipedOutputStream(input);
-        output.write(xmlText.getBytes(Charset.forName("utf-8")), 0, xmlText.length());
-        output.flush();
-        output.close();
-        IQRFConfiguration config = IQRFConfigurationLoader.getInstance().load(input);
-        input.close();
+//        PipedInputStream input = new PipedInputStream();
+//        PipedOutputStream output = new PipedOutputStream(input);
+//        output.write(xmlText.getBytes(Charset.forName("utf-8")), 0, xmlText.length());
+//        output.flush();
+//        output.close();
+        IQRFConfiguration config = SimpleXMLConfigurationLoader.getInstance().load(xmlText);
+//        input.close();
         log.debug("unmarshal - end: " + config);
         return config;
     }
