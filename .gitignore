@@ -16,3 +16,6 @@ hs_err_pid*
 /jlibiqrf-modules/jlibiqrf/target
 /jlibiqrf-modules/jlibiqrf-examples/target
 /jlibiqrf-modules/jlibiqrf-demos/target
+/jlibiqrf-modules/bridge-iqrf-mqtt/target/
+/jlibiqrf-modules/jlibiqrf-modules/bridge-iqrf-mqtt/target/
+/jlibiqrf-modules/jlibiqrf-demos/bridge-iqrf-mqtt/target/
