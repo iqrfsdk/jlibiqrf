@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.microrisc.jlibiqrf.demos;
+package com.microrisc.jlibiqrf.bridge;
 
-import com.microrisc.jlibiqrf.demos.config.BridgeConfiguration;
-import com.microrisc.jlibiqrf.demos.iqrf.IQRFCommunicator;
-import com.microrisc.jlibiqrf.demos.json.SimpleJsonConvertor;
-import com.microrisc.jlibiqrf.demos.mqtt.MQTTCommunicator;
+import com.microrisc.jlibiqrf.bridge.config.BridgeConfiguration;
+import com.microrisc.jlibiqrf.bridge.iqrf.IQRFCommunicator;
+import com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor;
+import com.microrisc.jlibiqrf.bridge.mqtt.MQTTCommunicator;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;

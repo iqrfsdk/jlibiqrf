@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.microrisc.jlibiqrf.demos.mqtt;
+package com.microrisc.jlibiqrf.bridge.mqtt;
 
-import com.microrisc.jlibiqrf.demos.Bridge;
-import com.microrisc.jlibiqrf.demos.config.MQTTConfiguration;
+import com.microrisc.jlibiqrf.bridge.Bridge;
+import com.microrisc.jlibiqrf.bridge.config.MQTTConfiguration;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;

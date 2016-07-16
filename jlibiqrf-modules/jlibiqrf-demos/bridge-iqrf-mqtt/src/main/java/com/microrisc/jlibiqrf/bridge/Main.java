@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.microrisc.jlibiqrf.demos;
+package com.microrisc.jlibiqrf.bridge;
 
-import com.microrisc.jlibiqrf.demos.config.BridgeConfiguration;
-import com.microrisc.jlibiqrf.demos.config.SimpleBridgeConfigurationLoader;
+import com.microrisc.jlibiqrf.bridge.config.BridgeConfiguration;
+import com.microrisc.jlibiqrf.bridge.config.SimpleBridgeConfigurationLoader;
 
 public class Main {
     

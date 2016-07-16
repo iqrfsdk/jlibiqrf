@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.microrisc.jlibiqrf.demos.iqrf;
+package com.microrisc.jlibiqrf.bridge.iqrf;
 
 import com.microrisc.jlibiqrf.IQRFListener;
 import com.microrisc.jlibiqrf.JLibIQRF;
-import com.microrisc.jlibiqrf.demos.Bridge;
-import com.microrisc.jlibiqrf.demos.config.BridgeConfiguration;
+import com.microrisc.jlibiqrf.bridge.Bridge;
+import com.microrisc.jlibiqrf.bridge.config.BridgeConfiguration;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

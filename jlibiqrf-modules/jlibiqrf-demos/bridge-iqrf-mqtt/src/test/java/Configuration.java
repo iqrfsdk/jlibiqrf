@@ -1,7 +1,7 @@
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
-import com.microrisc.jlibiqrf.demos.config.BridgeConfiguration;
-import com.microrisc.jlibiqrf.demos.config.MQTTConfiguration;
-import com.microrisc.jlibiqrf.demos.config.SimpleBridgeConfigurationLoader;
+import com.microrisc.jlibiqrf.bridge.config.BridgeConfiguration;
+import com.microrisc.jlibiqrf.bridge.config.MQTTConfiguration;
+import com.microrisc.jlibiqrf.bridge.config.SimpleBridgeConfigurationLoader;
 import com.microrisc.jlibiqrf.iqrfLayer.cdc.CDCConfiguration;
 
 /*

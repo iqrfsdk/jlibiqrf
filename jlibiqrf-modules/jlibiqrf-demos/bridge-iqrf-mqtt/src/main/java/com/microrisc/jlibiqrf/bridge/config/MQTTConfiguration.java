@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.microrisc.jlibiqrf.demos.config;
+package com.microrisc.jlibiqrf.bridge.config;
 
 import java.util.Random;
 import java.util.UUID;
