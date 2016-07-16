@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Bridge_configuration>
+    <IQRF_config_path>config/spi-config.xml</IQRF_config_path>
+    <Client_id>client idčko</Client_id>
+    <MQTT_broker_protocol>tcp</MQTT_broker_protocol>
+    <MQTT_broker_address>adresa</MQTT_broker_address>
+    <MQTT_broker_port>0</MQTT_broker_port>
+    <Checking_interval>10000</Checking_interval>
+    <Subscribed_topics>unknown/dpa/requests</Subscribed_topics>
+    <JSON_convertor>com.microrisc.jlibiqrf.demos.json.SimpleJsonConvertor</JSON_convertor>
+</Bridge_configuration>

@@ -45,7 +45,7 @@ public class Bridge {
         iqrfData = new LinkedList<>();
         
         IQRFCommunicator iqrfCom = new IQRFCommunicator(this);
-        iqrfCom.init();
+        iqrfCom.init(config);
         
         MQTTCommunicator mqttCom = new MQTTCommunicator(
                 config.getClientId(),

@@ -18,6 +18,7 @@ package com.microrisc.jlibiqrf.demos.iqrf;
 import com.microrisc.jlibiqrf.IQRFListener;
 import com.microrisc.jlibiqrf.JLibIQRF;
 import com.microrisc.jlibiqrf.demos.Bridge;
+import com.microrisc.jlibiqrf.demos.config.BridgeConfiguration;
 import com.microrisc.jlibiqrf.iqrfLayer.cdc.CDCConfiguration;
 import java.util.Arrays;
 import org.slf4j.Logger;
@@ -46,8 +47,8 @@ public class IQRFCommunicator implements IQRFListener {
     /**
      * Init IQRF communicator.
      */
-    public void init() {
-        JLibIQRF iqrf = JLibIQRF.init(new CDCConfiguration("COM5"));
+    public void init(BridgeConfiguration config) {
+        JLibIQRF iqrf = JLibIQRF.init(config.getIqrfConfig());
         iqrf.addIQRFListener(this);
         iqrfLib = iqrf;
         comThread = new CommunicatingThread();
