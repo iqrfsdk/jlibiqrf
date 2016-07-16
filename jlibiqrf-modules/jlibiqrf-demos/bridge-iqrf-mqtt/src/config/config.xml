@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Bridge_configuration>
-    <IQRF_config_path>src/config/cdc-config.xml</IQRF_config_path>
-    <Client_id>client idčko</Client_id>
-    <MQTT_broker_protocol>tcp</MQTT_broker_protocol>
-    <MQTT_broker_address>adresa</MQTT_broker_address>
-    <MQTT_broker_port>0</MQTT_broker_port>
+    <IQRF_config_path>config-2016-07-16_22-39-11-716</IQRF_config_path>
+    <MQTT_config>
+        <Protocol>tcp</Protocol>
+        <Broker>192.168.154.5</Broker>
+        <Port>0</Port>
+        <Client_id>f384949afd574bdea7563cf4d9bd2936</Client_id>
+        <Clean_session>true</Clean_session>
+        <Quite_mode>false</Quite_mode>
+        <SSL>false</SSL>
+    </MQTT_config>
     <Checking_interval>10000</Checking_interval>
     <Subscribed_topics>unknown/dpa/requests</Subscribed_topics>
     <JSON_convertor>com.microrisc.jlibiqrf.demos.json.SimpleJsonConvertor</JSON_convertor>

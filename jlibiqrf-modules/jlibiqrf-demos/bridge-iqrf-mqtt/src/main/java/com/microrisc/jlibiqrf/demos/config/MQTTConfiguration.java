@@ -1,0 +1,196 @@
+/*
+ * Copyright 2016 MICRORISC s.r.o.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.microrisc.jlibiqrf.demos.config;
+
+import java.util.Random;
+import java.util.UUID;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
+/**
+ * Encapsulates configuration of MQTT.
+ * 
+ * @author Martin Strouhal
+ */
+@XmlType( name = "MQTT_config")
+public final class MQTTConfiguration {
+
+    @XmlElement(name = "Protocol")
+    private final String protocol;
+    @XmlElement(name = "Broker")
+    private final String broker;
+    @XmlElement(name = "Port")
+    private final long port;
+    @XmlElement(name = "Client_id")
+    private final String clientId;
+    @XmlElement(name = "Clean_session")
+    private final boolean cleanSession;
+    @XmlElement(name = "Quite_mode")
+    private final boolean quiteMode;
+    @XmlElement(name = "SSL")
+    private final boolean ssl;
+    @XmlElement(name = "Certificate_file_path")
+    private final String certFilePath;
+    @XmlElement(name = "Username")
+    private final String userName;
+    @XmlElement(name = "Password")
+    private final String password;
+
+    /** For JAXB purpose only */
+    private MQTTConfiguration(){
+        protocol = broker = clientId = certFilePath = userName = password = null;
+        port = 0;
+        cleanSession = quiteMode = ssl = false;
+    }
+    
+    /** For ConfigurationBuilder only */
+    private MQTTConfiguration(ConfigurationBuilder builder) {
+        this.protocol = builder.protocol;
+        this.broker = builder.broker;
+        this.port = builder.port;
+        this.clientId = builder.clientId;
+        this.cleanSession = builder.cleanSession;
+        this.quiteMode = builder.quiteMode;
+        this.ssl = builder.ssl;
+        this.certFilePath = builder.certFilePath;
+        this.userName = builder.userName;
+        this.password = builder.password;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public String getBroker() {
+        return broker;
+    }
+
+    public long getPort() {
+        return port;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public boolean isCleanSession() {
+        return cleanSession;
+    }
+
+    public boolean isQuiteMode() {
+        return quiteMode;
+    }
+
+    public boolean isSSL() {
+        return ssl;
+    }
+
+    public String getCertFilePath() {
+        if(!ssl){
+            throw new IllegalStateException("SSL isn't configured and it's disabled!");
+        }
+        return certFilePath;
+    }
+
+    public String getUserName() {
+        if(!ssl){
+            throw new IllegalStateException("SSL isn't configured and it's disabled!");
+        }
+        return userName;
+    }
+
+    public String getPassword() {
+        if(!ssl){
+            throw new IllegalStateException("SSL isn't configured and it's disabled!");
+        }
+        return password;
+    }
+    
+    public String getCompleteAddress(){
+        return protocol + "://" + broker + ":" + port;
+    }
+
+    @Override
+    public String toString() {
+        return "MQTTConfiguration{" + "broker=" + getCompleteAddress() + ", clientId=" + clientId + ", cleanSession=" + cleanSession + ", quiteMode=" + quiteMode + ", ssl=" + ssl + ", certFilePath=" + certFilePath + ", userName=" + userName + ", password=" + password + '}';
+    }
+    
+    public static class ConfigurationBuilder {
+
+        private final int DEFAULT_PORT = 0;
+        private final String DEFAULT_PROTOCOL = "tcp";
+        private final boolean DEFAULT_SSL = false;
+        private final boolean DEFAULT_CLEAN_SESSION = true;
+        private final boolean DEFAULT_QUITE_MODE = false;
+        
+        private String protocol = DEFAULT_PROTOCOL;
+        private final String broker;
+        private long port = DEFAULT_PORT;
+        private String clientId;
+        private boolean cleanSession = DEFAULT_CLEAN_SESSION;
+        private boolean quiteMode = DEFAULT_QUITE_MODE;
+        private boolean ssl = DEFAULT_SSL;
+        private String certFilePath;
+        private String userName;
+        private String password;
+        
+        public ConfigurationBuilder(String broker){
+            this.broker = broker;
+            Random r = new Random();
+            this.clientId = UUID.randomUUID().toString().replace("-", "");
+        }
+        
+        
+        public ConfigurationBuilder clientId(String clientId){
+            this.clientId = clientId;
+            return this;
+        }
+        
+        public ConfigurationBuilder protocol(String protocol){
+            this.protocol = protocol;
+            return this;
+        }
+        
+        public ConfigurationBuilder port(int port){
+            this.port = port;
+            return this;
+        }
+        
+        public ConfigurationBuilder cleanSession(boolean cleanSession){
+            this.cleanSession = cleanSession;
+            return this;
+        }
+        
+        public ConfigurationBuilder quiteMode(boolean quiteMode){
+            this.quiteMode = quiteMode;
+            return this;
+        }
+        
+        public ConfigurationBuilder ssl(String certFilePath, String username, 
+                String password)
+        {
+            this.ssl = true;
+            this.certFilePath = certFilePath;
+            this.userName = username;
+            this.password = password;
+            return this;
+        }
+        
+        public MQTTConfiguration build(){
+            return new MQTTConfiguration(this);
+        }
+    }
+}

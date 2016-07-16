@@ -18,19 +18,23 @@ package com.microrisc.jlibiqrf.demos;
 import com.microrisc.jlibiqrf.demos.config.BridgeConfiguration;
 import com.microrisc.jlibiqrf.demos.config.SimpleBridgeConfigurationLoader;
 
-/**
- *
- * @author Martin Strouhal
- */
 public class Main {
     
     public static void main(String[] args) {
-        //BridgeConfiguration config = SimpleBridgeConfigurationLoader.getInstance().load("src/config/config.xml");
-        BridgeConfiguration config = SimpleBridgeConfigurationLoader.getInstance().load(args[0]);
+        BridgeConfiguration config = SimpleBridgeConfigurationLoader.getInstance().load("src/config/config.xml");
+       // BridgeConfiguration config = SimpleBridgeConfigurationLoader.getInstance().load(args[0]);
         System.out.println("Loaded config: " + config.toString());
         
         Bridge bridge = new Bridge(config);
         System.out.println("Bridge started");
+        
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run() {
+                System.out.println("Bridge will be canceled.");
+                bridge.destroy();
+            }
+        });
     }
     
 }

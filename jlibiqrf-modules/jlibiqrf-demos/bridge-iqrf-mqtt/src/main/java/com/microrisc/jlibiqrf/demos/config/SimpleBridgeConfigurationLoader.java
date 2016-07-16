@@ -59,7 +59,7 @@ public class SimpleBridgeConfigurationLoader implements
     public void saveBridgeConfiguration(BridgeConfiguration config, String path) {
         try {
             File file = new File(path);
-            JAXBContext jaxbContext = JAXBContext.newInstance(BridgeConfiguration.class);
+            JAXBContext jaxbContext = JAXBContext.newInstance(BridgeConfiguration.class, MQTTConfiguration.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);

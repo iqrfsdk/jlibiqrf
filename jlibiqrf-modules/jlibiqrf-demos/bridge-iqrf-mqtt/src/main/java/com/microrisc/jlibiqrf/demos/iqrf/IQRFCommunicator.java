@@ -19,7 +19,6 @@ import com.microrisc.jlibiqrf.IQRFListener;
 import com.microrisc.jlibiqrf.JLibIQRF;
 import com.microrisc.jlibiqrf.demos.Bridge;
 import com.microrisc.jlibiqrf.demos.config.BridgeConfiguration;
-import com.microrisc.jlibiqrf.iqrfLayer.cdc.CDCConfiguration;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,5 +88,11 @@ public class IQRFCommunicator implements IQRFListener {
                 }
             }
         }
+    }
+    
+    /** Free-up resources. */
+    public void destroy(){
+        comThread.interrupt();
+        iqrfLib.destroy();
     }
 }

@@ -33,14 +33,8 @@ public final class BridgeConfiguration {
     @XmlElement(name = "IQRF_config_path")
     @XmlJavaTypeAdapter(IQRFConfigurationAdapter.class)
     private final IQRFConfiguration iqrfConfig;
-    @XmlElement(name = "Client_id")
-    private final String clientId;
-    @XmlElement(name = "MQTT_broker_protocol")
-    private final String mqttBrokerProtocol;
-    @XmlElement(name = "MQTT_broker_address")
-    private final String mqttBrokerAddress;
-    @XmlElement(name = "MQTT_broker_port")
-    private final Integer mqttBrokerPort;
+    @XmlElement( name = "MQTT_config")
+    private final MQTTConfiguration mqttConfig;
     @XmlElement(name = "Checking_interval")
     private final Integer checkingInterval;
     @XmlElement(name = "Subscribed_topics")
@@ -51,38 +45,23 @@ public final class BridgeConfiguration {
     /** For JAXB purpose only */
     private BridgeConfiguration(){
         iqrfConfig = null;
-        mqttBrokerProtocol = clientId = mqttBrokerAddress = null;
-        mqttBrokerPort = checkingInterval = null;
+        checkingInterval = null;
         subscribedTopics = null;
         jsonConvertor = null;
+        mqttConfig = null;
     }
     
     /** For ConfigurationBuilder only */
     private BridgeConfiguration(ConfigurationBuilder builder) {
         this.iqrfConfig = builder.iqrfConfig;
-        this.clientId = builder.clientId;
-        this.mqttBrokerAddress = builder.mqttBrokerAddress;
-        this.mqttBrokerPort = builder.mqttBrokerPort;
         this.checkingInterval = builder.checkingInterval;
         this.subscribedTopics = builder.subscribedTopics;
         this.jsonConvertor = builder.jsonConvertor;
-        this.mqttBrokerProtocol = builder.mqttBrokerProtocol;
+        this.mqttConfig = builder.mqttConfig;
     }
 
     public IQRFConfiguration getIqrfConfig() {
         return iqrfConfig;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public String getMqttBrokerAddress() {
-        return mqttBrokerAddress;
-    }
-
-    public Integer getMqttBrokerPort() {
-        return mqttBrokerPort;
     }
 
     public Integer getCheckingInterval() {
@@ -97,59 +76,35 @@ public final class BridgeConfiguration {
         return jsonConvertor;
     }
 
-    public String getMqttBrokerProtocol() {
-        return mqttBrokerProtocol;
+    public MQTTConfiguration getMqttConfig() {
+        return mqttConfig;
     }
 
-    public String getCompleteAddress(){
-        return mqttBrokerProtocol + "://" + mqttBrokerAddress + ":" + mqttBrokerPort;
-    }
-    
     @Override
     public String toString() {
-        return "BridgeConfiguration{" + "iqrfConfig=" + iqrfConfig + ", clientId=" + clientId + ", mqttBrokerProtocol=" + mqttBrokerProtocol + ", mqttBrokerAddress=" + mqttBrokerAddress + ", mqttBrokerPort=" + mqttBrokerPort + ", checkingInterval=" + checkingInterval + ", subscribedTopics=" + subscribedTopics + ", jsonConvertor=" + jsonConvertor + '}';
+        return "BridgeConfiguration{" + "iqrfConfig=" + iqrfConfig + ", mqttConfig=" + mqttConfig + ", checkingInterval=" + checkingInterval + ", subscribedTopics=" + subscribedTopics + ", jsonConvertor=" + jsonConvertor + '}';
     }
     
     public static class ConfigurationBuilder {
 
-        private final int DEFAULT_MQTT_BROKER_PORT = 0;
         private final int DEFAULT_CHECKING_INTERVAL = 1000;
         private final String[] DEFAULT_SUBSCRIBED_TOPICS = new String[]{"unknown/dpa/requests"};
         private final Class DEFAULT_JSON_CONVERTOR = SimpleJsonConvertor.class;
-        private final String DEFAULT_MQTT_PROTOCOL = "tcp";
         
         private final IQRFConfiguration iqrfConfig;
-        private String mqttBrokerProtocol = DEFAULT_MQTT_PROTOCOL;
-        private final String mqttBrokerAddress;
-        private String clientId;
-        private int mqttBrokerPort = DEFAULT_MQTT_BROKER_PORT;
+        private final MQTTConfiguration mqttConfig;
         private int checkingInterval = DEFAULT_CHECKING_INTERVAL;
         private String[] subscribedTopics = DEFAULT_SUBSCRIBED_TOPICS;
         private Class jsonConvertor = DEFAULT_JSON_CONVERTOR;
         
-        public ConfigurationBuilder(String mqttBrokerAddress, String config){
-            this.mqttBrokerAddress = mqttBrokerAddress;
-            this.iqrfConfig = SimpleIQRFConfigurationLoader.getInstance().load(config);
+        public ConfigurationBuilder(String iqrfConfigPath, MQTTConfiguration mqttConfig){
+            this.iqrfConfig = SimpleIQRFConfigurationLoader.getInstance().load(iqrfConfigPath);
+            this.mqttConfig = mqttConfig;
         }
         
-        public ConfigurationBuilder(String mqttBrokerAddress, IQRFConfiguration config){
-            this.mqttBrokerAddress = mqttBrokerAddress;
+        public ConfigurationBuilder(IQRFConfiguration config, MQTTConfiguration mqttConfig){
             this.iqrfConfig = config;
-        }
-        
-        public ConfigurationBuilder clientId(String clientId){
-            this.clientId = clientId;
-            return this;
-        }
-        
-        public ConfigurationBuilder mqttProtocol(String protocol){
-            this.mqttBrokerProtocol = protocol;
-            return this;
-        }
-        
-        public ConfigurationBuilder mqttBrokerPort(int port){
-            this.mqttBrokerPort = port;
-            return this;
+            this.mqttConfig = mqttConfig;
         }
         
         public ConfigurationBuilder checkingInterval(int interval){

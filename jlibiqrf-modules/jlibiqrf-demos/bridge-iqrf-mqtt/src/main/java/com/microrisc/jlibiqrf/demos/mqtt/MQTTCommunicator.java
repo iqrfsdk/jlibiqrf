@@ -17,14 +17,24 @@
 package com.microrisc.jlibiqrf.demos.mqtt;
 
 import com.microrisc.jlibiqrf.demos.Bridge;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
+import com.microrisc.jlibiqrf.demos.config.MQTTConfiguration;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.*;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.sql.Timestamp;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import org.eclipse.paho.client.mqttv3.*;
+import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,84 +42,127 @@ import org.slf4j.LoggerFactory;
  *
  * @author Rostislav Spinar
  */
-public class MQTTCommunicator extends MQTTCommunicationHandler {
-    
-    /** Logger.*/
-    private static final Logger log = LoggerFactory.getLogger(MQTTCommunicator.class);
+public class MQTTCommunicator implements MqttCallback {
+
+    // Private instance variables
+    private MqttClient client;
+    private final MQTTConfiguration config;
+    private MqttConnectOptions conOptions;
+    private final Bridge bridge;
     
     private ScheduledExecutorService service = Executors.newScheduledThreadPool(2);
     private ScheduledFuture<?> dataPushServiceHandler;
-    private Bridge appLogic;
     
-    /** Creates instance of {@link MQTTCommunicator}.
-     * 
-     * @param clientId which will be used for connection
-     * @param mqttBrokerEndPoint like address for connection
-     * @param subscribeTopics which will be subscribed
-     * @param logic which us used for central communication
+    private static final Logger log = LoggerFactory.getLogger(MQTTCommunicator.class);
+
+    /**
+     * Constructs an instance of the sample client wrapper
+     *
+     * @param MQTTConfig the configuration params of the server to connect to
+     * @param bridge used for communication bridging
+     * @throws MqttException
      */
-    public MQTTCommunicator(String clientId, String mqttBrokerEndPoint, 
-            List<String> subscribeTopics, Bridge logic
-    ) {
-        super(clientId, mqttBrokerEndPoint, subscribeTopics);
-        appLogic = logic;
+    public MQTTCommunicator(MQTTConfiguration mqttConfig, Bridge bridge) throws MqttException {
+        this.config = mqttConfig;
+        this.bridge = bridge;
         
-    }
-    
-    /** Returns {@link MQTTCommunicator#dataPushServiceHandler}.
-     * 
-     * @return instance of data push service handler
-     */
-    public ScheduledFuture<?> getDataPushServiceHandler() {
-        return dataPushServiceHandler;
-    }
-    
-    @Override
-    public void connect() {
-        Runnable connector = new Runnable() {
-            public void run() {
-                // start up if not up and running already
-                while (!isConnected()) {
-                    try {
-                        connectToBroker();
-                        subscribeToBroker();
-                        checkAndPublishDeviceData(dataCheckAndPushInterval);
+    	//This sample stores in a temporary directory... where messages temporarily
+        // stored until the message has been delivered to the server.
+        //..a real application ought to store them somewhere
+        // where they are not likely to get deleted or tampered with
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        MqttDefaultFilePersistence dataStore = new MqttDefaultFilePersistence(tmpDir);
 
-                    } catch (CommunicationHandlerException e) {
-                        log.warn("Connection/Subscription to MQTT Broker at: "
-                                + mqttBrokerEndPoint + " failed");
+        try {
+            // Construct the connection options object that contains connection parameters
+            // such as cleanSession and LWT
+            conOptions = new MqttConnectOptions();
+            conOptions.setCleanSession(config.isCleanSession());
+            
+            if(config.isSSL()){
+                conOptions.setPassword(config.getPassword().toCharArray());
+                conOptions.setUserName(config.getUserName());
+                
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
 
-                        try {
-                            log.debug("Going to sleep during connecting pause");
-                            Thread.currentThread().sleep(timeoutInterval);
-                            log.debug("Going from sleep during connectin pause");
-                        } catch (InterruptedException ex) {
-                            log.error("MQTT-Subscriber: Thread Sleep Interrupt Exception");
-                        }
-                    }
-                }
+                InputStream certFileInputStream = fullStream(config.getCertFilePath());
+                Certificate ca = cf.generateCertificate(certFileInputStream);
+
+                KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                keyStore.load(null);
+                keyStore.setCertificateEntry("ca", ca);
+
+                TrustManagerFactory trustManagerFactory = TrustManagerFactory.
+                        getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                trustManagerFactory.init(keyStore);
+
+                SSLContext sslContext = SSLContext.getInstance("TLSv1");
+                sslContext.init(null, trustManagerFactory.getTrustManagers(),
+                                new SecureRandom());
+                conOptions.setSocketFactory(sslContext.getSocketFactory());
             }
-        };
 
-        Thread connectorThread = new Thread(connector);
-        connectorThread.setName("ConnectorThread");
-        connectorThread.setDaemon(true);
-        connectorThread.start();
+            // Construct an MQTT blocking mode client
+            client = new MqttClient(config.getCompleteAddress(), 
+                    mqttConfig.getClientId(), dataStore);
+
+            // Set this wrapper as the callback handler
+            client.setCallback(this);
+            
+            // Connect to the MQTT server
+            log("Connecting to " + config.getCompleteAddress() + 
+                    " with client ID " + client.getClientId());
+            
+            client.connect(conOptions);
+            log("Connected");
+
+        } catch (MqttException e) {
+            e.printStackTrace();
+            log("Unable to set up client: " + e.toString());
+            throw new RuntimeException("MQTT communicator cannot be created.");
+        } catch (CertificateException e) {
+            e.printStackTrace();
+            log("Unable to set up client - certificate exception: " + e.toString());
+            throw new RuntimeException("MQTT communicator cannot be created.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            log("Unable to set up client - certificate exception in input stream: " + e.toString());
+            throw new RuntimeException("MQTT communicator cannot be created.");
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+            log("Unable to set up client - certificate exception in key store: " + e.toString());
+            throw new RuntimeException("MQTT communicator cannot be created.");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            log("Unable to set up client - certificate exception in loading key store: " + e.toString());
+            throw new RuntimeException("MQTT communicator cannot be created.");
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+            log("Unable to set up client - certificate exception in ssl context: " + e.toString());
+            throw new RuntimeException("MQTT communicator cannot be created.");
+        }
     }
-    
-    @Override
+
+    /** Runs thread which is checking new messages to publish.
+     * 
+     * @param checkInterval how often is checking (in ms)
+     */
     public void checkAndPublishDeviceData(int checkInterval) {
         Runnable checkAndPushDataRunnable = new Runnable() {
             @Override
             public void run() {
-                if(appLogic.isAvailableIQRFData()){
+                if(bridge.isAvailableIQRFData()){
                     log.debug("MQTT com thread found available iqrf data. Data will be send to mqtt broker.");
-                    MqttMessage msg = appLogic.getAndRemoveIQRFData();
+                    MqttMessage msg = bridge.getAndRemoveIQRFData();
                     
                     System.out.println("msg: " + msg);
                     
-                    // publish data
-                    publishDeviceData("coordinator-mid/dpa/responses", new String(msg.getPayload()));
+                    try {
+                        // publish data
+                        publish("coordinator-mid/dpa/responses", 0, msg.getPayload());
+                    } catch (MqttException ex) {
+                        log.error(ex.getMessage());
+                    }
                     
                     log.debug("Data published");
                 }
@@ -119,69 +172,192 @@ public class MQTTCommunicator extends MQTTCommunicationHandler {
         dataPushServiceHandler = service.scheduleAtFixedRate(checkAndPushDataRunnable, checkInterval,
                 checkInterval, TimeUnit.MILLISECONDS);
     }
- 
-    /** Publish specified message into the specified topic.
-     * 
-     * @param topic in which will be message published
-     * @param message to publish
+    
+    /**
+     * Publish / send a message to an MQTT server
+     *
+     * @param topicName the name of the topic to publish to
+     * @param qos the quality of service to delivery the message at (0,1,2)
+     * @param payload the set of bytes to send to the MQTT server
+     * @throws MqttException
      */
-    private void publishDeviceData(String topic, String message) {        
+    public void publish(String topicName, int qos, byte[] payload) throws MqttException {
+
+        // Connect to the MQTT server
+        //log("Connecting to " + brokerUrl + " with client ID " + client.getClientId());
+        //client.connect(conOpt);
+        //log("Connected");
+
+        String time = new Timestamp(System.currentTimeMillis()).toString();
+        log("Publishing at: " + time + " to topic \"" + topicName + "\" qos " + qos);
+
+        // Create and configure a message
+        MqttMessage message = new MqttMessage(payload);
+        message.setQos(qos);
+
+    	// Send the message to the server, control is not returned until
+        // it has been delivered to the server meeting the specified
+        // quality of service.
+        client.publish(topicName, message);
+
+        // Disconnect the client
+        //client.disconnect();
+        //log("Disconnected");
+    }
+
+    /**
+     * Subscribe to a topic on an MQTT server Once subscribed this method waits
+     * for the messages to arrive from the server that match the subscription.
+     * It continues listening for messages until the enter key is pressed.
+     *
+     * @param topicName to subscribe to (can be wild carded)
+     * @param qos the maximum quality of service to receive messages at for this
+     * subscription
+     * @throws MqttException
+     */
+    public void subscribe(String topicName, int qos) throws MqttException {
         
-        MqttMessage pushMessage = new MqttMessage();
-        pushMessage.setPayload(message.getBytes(StandardCharsets.UTF_8));
-        pushMessage.setQos(DEFAULT_MQTT_QUALITY_OF_SERVICE);
-        pushMessage.setRetained(true);
+        // Connect to the MQTT server
+        //client.connect(conOpt);
+        //log("Connected to " + brokerUrl + " with client ID " + client.getClientId());
 
-        try {
-            publishToBroker(topic, pushMessage);
-            log.info("Message: '" + pushMessage
-                    + "' published to MQTT Queue at ["
-                    + mqttBrokerEndPoint
-                    + "] under topic [" + topic + "]");
+    	// Subscribe to the requested topic
+        // The QoS specified is the maximum level that messages will be sent to the client at.
+        // For instance if QoS 1 is specified, any messages originally published at QoS 2 will
+        // be downgraded to 1 when delivering to the client but messages published at 1 and 0
+        // will be received at the same level they were published at.
+        log("Subscribing to topic \"" + topicName + "\" qos " + qos);
+        client.subscribe(topicName, qos);
 
-        } catch (CommunicationHandlerException e) {
-            log.warn("Data publish attempt to topic - ["
-                    + topic + "] failed for payload ["
-                    + message + "]");
+        // Disconnect the client from the server
+        //client.disconnect();
+        //log("Disconnected");
+    }
+
+    /**
+     * Utility method to handle logging. If 'quietMode' is set, this method does
+     * nothing
+     *
+     * @param message the message to log
+     */
+    private void log(String message) {
+        if (!config.isQuiteMode()) {
+            System.out.println(message);
         }
     }
-    
-    @Override
-    public void processIncomingMessage(String topic, MqttMessage message) {
-        appLogic.addMqqtMessage(message);
+
+    /**
+     * @see MqttCallback#connectionLost(Throwable)
+     */
+    public void connectionLost(Throwable cause) {
+	
+        // Called when the connection to the server has been lost.
+        // An application may choose to implement reconnection
+        // logic at this point. This sample simply exits.
+        log("Connection to " + config.getCompleteAddress() + " lost!" + cause);
+
+        // Connect to the MQTT server
+        log("Reconnecting to " + config.getCompleteAddress() + " with client ID " + client.getClientId());
+        
+        conOptions = new MqttConnectOptions();
+        conOptions.setCleanSession(false);
+        
+        try {
+            client.connect(conOptions);
+        } catch (MqttException ex) {
+            log("Reconnecting to " + config.getCompleteAddress() + " with client "
+                    + "ID " + client.getClientId() + "failed!" + ex.getMessage());
+        }
+        
+        log("Connected");
+    }
+
+    /**
+     * @see MqttCallback#deliveryComplete(IMqttDeliveryToken)
+     */
+    public void deliveryComplete(IMqttDeliveryToken token) {
+        
+        // Called when a message has been delivered to the
+        // server. The token passed in here is the same one
+        // that was passed to or returned from the original call to publish.
+        // This allows applications to perform asynchronous
+        // delivery without blocking until delivery completes.
+        //
+        // This sample demonstrates asynchronous deliver and
+        // uses the token.waitForCompletion() call in the main thread which
+        // blocks until the delivery has completed.
+        // Additionally the deliveryComplete method will be called if
+        // the callback is set on the client
+        //
+        // If the connection to the server breaks before delivery has completed
+        // delivery of a message will complete after the client has re-connected.
+        // The getPendingTokens method will provide tokens for any messages
+        // that are still to be delivered.
+    }
+
+    /**
+     * @see MqttCallback#messageArrived(String, MqttMessage)
+     */
+    public void messageArrived(String topic, MqttMessage message) throws MqttException {
+	
+        // Called when a message arrives from the server that matches any
+        // subscription made by the client
+        
+        String time = new Timestamp(System.currentTimeMillis()).toString();
+        System.out.println("Time:\t" + time
+                           + "  Topic:\t" + topic
+                           + "  Message:\t" + new String(message.getPayload())
+                           + "  QoS:\t" + message.getQos());
+        
+        // get data as string
+        final String msg = new String(message.getPayload());
+        
+        //String resultToBeSent = null;
+        //resultToBeSent = OpenGateway.sendDPAWebRequest(topic, msg);
+
+        bridge.addMqqtMessage(message);
 
         log.info("Message: '" + new String(message.getPayload())
                 + "' published to internal DPA Queue with topic [" + topic + "]");
+
+/*
+        if(resultToBeSent != null) {
+            publish(Topics.ACTUATORS_RESPONSES_LEDS, 2, resultToBeSent.getBytes());
+        }
+*/
+        
     }
     
-    @Override
-    public void disconnect() {
-        Runnable stopConnection = new Runnable() {
-            public void run() {
-                while (isConnected()) {
-                    try {
-                        dataPushServiceHandler.cancel(true);
-                        closeConnection();
-
-                    } catch (MqttException e) {
-                        if (log.isDebugEnabled()) {
-                            log.warn("Unable to 'STOP' MQTT connection at broker at: "
-                                    + mqttBrokerEndPoint);
-                        }
-
-                        try {
-                            Thread.sleep(timeoutInterval);
-                        } catch (InterruptedException e1) {
-                            log.error("MQTT-Terminator: Thread Sleep Interrupt Exception");
-                        }
-                    }
-                }
+    /**
+     * <p>Creates an InputStream from a file, and fills it with the complete
+     * file. Thus, available() on the returned InputStream will return the
+     * full number of bytes the file contains</p>
+     * @param fname The filename
+     * @return The filled InputStream
+     * @exception IOException, if the Streams couldn't be created.
+     **/
+    private InputStream fullStream( String fname ) throws IOException {
+        InputStream is = this.getClass().getResourceAsStream(fname);
+        //FileInputStream fis = new FileInputStream(fname);
+        
+        DataInputStream dis = new DataInputStream(is);
+        byte[] bytes = new byte[dis.available()];
+        dis.readFully(bytes);
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        return bais;
+    }
+    
+    /** Free-up resources. */
+    public void destroy(){
+        if(!dataPushServiceHandler.isCancelled()) {
+            dataPushServiceHandler.cancel(false);
+        }
+        if (!client.isConnected()) {
+            try {
+                client.disconnect();
+            } catch (MqttException ex) {
+                log.warn(ex.getMessage());
             }
-        };
-
-        Thread terminatorThread = new Thread(stopConnection);
-        terminatorThread.setName("TerminatorThread");
-        terminatorThread.setDaemon(true);
-     //   terminatorThread.start();
+        }
     }
 }

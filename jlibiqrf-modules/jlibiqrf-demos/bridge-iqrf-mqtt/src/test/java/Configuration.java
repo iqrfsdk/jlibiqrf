@@ -1,6 +1,7 @@
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
-import com.microrisc.jlibiqrf.demos.config.SimpleBridgeConfigurationLoader;
 import com.microrisc.jlibiqrf.demos.config.BridgeConfiguration;
+import com.microrisc.jlibiqrf.demos.config.MQTTConfiguration;
+import com.microrisc.jlibiqrf.demos.config.SimpleBridgeConfigurationLoader;
 import com.microrisc.jlibiqrf.iqrfLayer.cdc.CDCConfiguration;
 
 /*
@@ -33,17 +34,18 @@ public class Configuration {
         
         IQRFConfiguration cdcConfig = new CDCConfiguration("COM5");
         
-        BridgeConfiguration config = new BridgeConfiguration.ConfigurationBuilder("adresa", cdcConfig)
+        MQTTConfiguration mqttConfig = new MQTTConfiguration.ConfigurationBuilder("192.168.154.5").build();
+        
+        BridgeConfiguration config = new BridgeConfiguration.ConfigurationBuilder(cdcConfig, mqttConfig)
                 .checkingInterval(10000)
-                .clientId("client idčko")
                 .build();
         
         System.out.println("before: " + config.toString());
         
         System.out.println("-------------------------------------------------");
         
-        //  SimpleBridgeConfigurationLoader.getInstance().saveBridgeConfiguration(
-        //        config, "src/config/config.xml");
+          SimpleBridgeConfigurationLoader.getInstance().saveBridgeConfiguration(
+                config, "src/config/config.xml");
 
         System.out.println("-------------------------------------------------");
         
@@ -52,12 +54,6 @@ public class Configuration {
         
         System.out.println(config);
         
-        System.out.println("-------------------------------------------------");
-        
-        SimpleBridgeConfigurationLoader.getInstance().saveBridgeConfiguration(
-                config, "src/config/config.xml");
-        
-        System.out.println("end");
     }
     
 }

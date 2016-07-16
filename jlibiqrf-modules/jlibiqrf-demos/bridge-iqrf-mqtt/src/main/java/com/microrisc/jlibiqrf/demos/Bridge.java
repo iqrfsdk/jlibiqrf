@@ -22,6 +22,7 @@ import com.microrisc.jlibiqrf.demos.mqtt.MQTTCommunicator;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,21 +39,28 @@ public class Bridge {
     private final Queue<MqttMessage> mqttMessages;
     // queue for data from IQRF network
     private final Queue<short[]> iqrfData;
+    private final MQTTCommunicator mqttCommunicator;
+    private final IQRFCommunicator iqrfCommunicator;
     
     public Bridge(BridgeConfiguration config){
         log.debug("Bridge - init - start: config={}", config);
         mqttMessages = new LinkedList<>();
         iqrfData = new LinkedList<>();
         
-        IQRFCommunicator iqrfCom = new IQRFCommunicator(this);
-        iqrfCom.init(config);
+        iqrfCommunicator = new IQRFCommunicator(this);
+        iqrfCommunicator.init(config);
         
-        MQTTCommunicator mqttCom = new MQTTCommunicator(
-                config.getClientId(),
-                config.getCompleteAddress(),
-                Arrays.asList(config.getSubscribedTopics()), this);
-        mqttCom.connect();
-        mqttCom.checkAndPublishDeviceData(config.getCheckingInterval());
+        try {
+            mqttCommunicator = new MQTTCommunicator(config.getMqttConfig(), this);
+            for (String topic : config.getSubscribedTopics()) {
+                mqttCommunicator.subscribe(topic, 0);
+            }
+            mqttCommunicator.checkAndPublishDeviceData(config.getCheckingInterval());
+        } catch (MqttException ex) {
+            log.error(ex.getMessage());
+            throw new RuntimeException(ex);
+        }
+        
         log.debug("Bridge - init - end");
     }
 
@@ -111,5 +119,10 @@ public class Bridge {
                 return new MqttMessage(new String(Arrays.toString(data)).getBytes());
             }
         }
+    }
+    
+    public void destroy(){
+        iqrfCommunicator.destroy();
+        mqttCommunicator.destroy();
     }
 }
