@@ -15,9 +15,9 @@
  */
 package com.microrisc.jlibiqrf.bridge.config;
 
+import com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor;
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
 import com.microrisc.jlibiqrf.configuration.SimpleIQRFConfigurationLoader;
-import com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -35,11 +35,11 @@ public final class BridgeConfiguration {
     private final IQRFConfiguration iqrfConfig;
     @XmlElement( name = "MQTT_config")
     private final MQTTConfiguration mqttConfig;
-    @XmlElement(name = "Checking_interval")
+    @XmlElement(name = "Checking_interval", defaultValue = "1000")
     private final Integer checkingInterval;
     @XmlElement(name = "Subscribed_topics")
     private final String[] subscribedTopics;
-    @XmlElement(name = "JSON_convertor")
+    @XmlElement(name = "JSON_convertor", defaultValue = "com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor")
     private final Class jsonConvertor;
 
     /** For JAXB purpose only */

@@ -28,19 +28,19 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType( name = "MQTT_config")
 public final class MQTTConfiguration {
 
-    @XmlElement(name = "Protocol")
+    @XmlElement(name = "Protocol", defaultValue = "tcp")
     private final String protocol;
     @XmlElement(name = "Broker")
     private final String broker;
-    @XmlElement(name = "Port")
+    @XmlElement(name = "Port", defaultValue = "1883")
     private final long port;
     @XmlElement(name = "Client_id")
     private final String clientId;
-    @XmlElement(name = "Clean_session")
+    @XmlElement(name = "Clean_session", defaultValue = "false")
     private final boolean cleanSession;
-    @XmlElement(name = "Quite_mode")
+    @XmlElement(name = "Quite_mode", defaultValue = "false")
     private final boolean quiteMode;
-    @XmlElement(name = "SSL")
+    @XmlElement(name = "SSL", defaultValue = "false")
     private final boolean ssl;
     @XmlElement(name = "Certificate_file_path")
     private final String certFilePath;
@@ -135,6 +135,7 @@ public final class MQTTConfiguration {
         private final boolean DEFAULT_SSL = false;
         private final boolean DEFAULT_CLEAN_SESSION = true;
         private final boolean DEFAULT_QUITE_MODE = false;
+        
         
         private String protocol = DEFAULT_PROTOCOL;
         private final String broker;
