@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<cdcConfiguration>
-    <communication_type>CDC</communication_type>
-    <port>COM5</port>
-</cdcConfiguration>
