@@ -15,15 +15,20 @@
  */
 package com.microrisc.jlibiqrf.bridge.json;
 
+import com.microrisc.jlibiqrf.bridge.mqtt.DPAReplyType;
+import com.microrisc.jlibiqrf.bridge.mqtt.PublishableMqttMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *  Provides convert services between iqrf data (short[]) and json data (String).
+ * Provides convert services between iqrf data (short[]) and json data (String).
  * 
  * @author Martin Strouhal
  */
@@ -50,6 +55,7 @@ public class SimpleJsonConvertor implements JsonConvertor {
     @Override
     public short[] toIQRF(Object json) {
         log.debug("toIQRF - start: json={}", json);
+        ArgumentChecker.checkNull(json);
         if (json instanceof String) {
             String jsonString = (String) json;
             try {
@@ -67,15 +73,40 @@ public class SimpleJsonConvertor implements JsonConvertor {
     }
 
     @Override
-    public Object toJson(short[] iqrf) {
-        log.debug("toJson - start: iqrf={}", Arrays.toString(iqrf));
-        ObjectNode iqrfData = mapper.createObjectNode();
-        iqrfData.put("nadr", getTwoShortAsInt(iqrf, 0));
-        iqrfData.put("per", iqrf[2]);
-        iqrfData.put("cmd", iqrf[3]);
-        iqrfData.put("hwpid", getTwoShortAsInt(iqrf, 4));
-        log.debug("toJson - end:" + iqrfData.toString());
-        return iqrfData.toString();
+    public PublishableMqttMessage toJson(short[] iqrfData) {
+        log.debug("toJson - start: iqrfData={}", Arrays.toString(iqrfData));
+        ArgumentChecker.checkNull(iqrfData);
+        
+        ObjectNode parsedData = mapper.createObjectNode();
+        parsedData.put("timestamp", new Timestamp(new Date().getTime()).toString());
+        
+        if(iqrfData.length > 6){
+            parseFoursome(parsedData, iqrfData);
+        }else{
+            log.warn("Unstandard message!");
+            parsedData.put("unparseableData", Arrays.toString(iqrfData));
+            parsedData.put("error", "Doesn|t contains packet information!");
+            log.debug("toJson - end:" + parsedData.toString());
+            return new PublishableMqttMessage(DPAReplyType.ERROR, parsedData.toString().getBytes());
+        }
+        
+        if(iqrfData.length > 7 && iqrfData[6] == 0xFF){    
+            if (iqrfData.length == 11) {
+                parseConfirmation(parsedData, iqrfData);
+                log.debug("toJson - end:" + parsedData.toString());
+                return new PublishableMqttMessage(DPAReplyType.CONFIRMATION, parsedData.toString().getBytes());
+            }else{
+                log.warn("Unstandard message!");
+                parsedData.put("unparseableData", Arrays.toString(iqrfData));
+                parsedData.put("error", "Invalid confirmation!");
+                log.debug("toJson - end:" + parsedData.toString());
+                return new PublishableMqttMessage(DPAReplyType.ERROR, parsedData.toString().getBytes());
+            }
+        }else{
+            parseResponse(parsedData, iqrfData);
+            log.debug("toJson - end:" + parsedData.toString());
+            return new PublishableMqttMessage(DPAReplyType.RESPONSE, parsedData.toString().getBytes());   
+        }                                        
     }
     
     /**
@@ -83,9 +114,34 @@ public class SimpleJsonConvertor implements JsonConvertor {
      * elements 255 and 0 is returned 0xF0.
      */
     private int getTwoShortAsInt(short[] array, int index){
-        int value = array[index];
+        int value = array[index+1];
         value <<=8;
-        value += array[index+1];
+        value += array[index];
         return value;
+    }
+
+    private void parseFoursome(ObjectNode parsedData, short[] iqrfData) {
+        parsedData.put("nadr", getTwoShortAsInt(iqrfData, 0));
+        parsedData.put("per", iqrfData[2]);
+        parsedData.put("cmd", iqrfData[3]);
+        parsedData.put("hwpid", getTwoShortAsInt(iqrfData, 4));
+    }
+
+    private void parseConfirmation(ObjectNode parsedData, short[] iqrfData) {
+        parsedData.put("dpaValue", iqrfData[7]);
+        parsedData.put("hops", iqrfData[8]);
+        parsedData.put("timeslotLength", iqrfData[9]);
+        parsedData.put("hopsResponse", iqrfData[10]);
+    }
+
+    private void parseResponse(ObjectNode parsedData, short[] iqrfData) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 6; iqrfData != null && i < iqrfData.length; i++) {
+            builder.append(iqrfData[i]);
+            if (i < iqrfData.length - 1) {
+                builder.append(',');
+            }
+        }
+        parsedData.put("data", builder.toString());
     }
 }

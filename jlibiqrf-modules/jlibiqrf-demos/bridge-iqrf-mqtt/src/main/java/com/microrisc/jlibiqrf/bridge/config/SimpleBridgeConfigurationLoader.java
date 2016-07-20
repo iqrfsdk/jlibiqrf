@@ -15,11 +15,14 @@
  */
 package com.microrisc.jlibiqrf.bridge.config;
 
+import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
 import java.io.File;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements {@link BridgeConfigurationLoader} for loading and saving 
@@ -30,6 +33,7 @@ import javax.xml.bind.Unmarshaller;
 public class SimpleBridgeConfigurationLoader implements 
         BridgeConfigurationLoader<String, String> {
 
+    private static final Logger log = LoggerFactory.getLogger(SimpleBridgeConfigurationLoader.class);
     private static final SimpleBridgeConfigurationLoader instance = new SimpleBridgeConfigurationLoader();
     
     private SimpleBridgeConfigurationLoader(){}
@@ -38,10 +42,13 @@ public class SimpleBridgeConfigurationLoader implements
         return instance;
     }
     
+    /**
+     * @throws RuntimeException if some error has been occurred while loading
+     */
     @Override
     public BridgeConfiguration load(String path) {
+        ArgumentChecker.checkNull(path);
         try {
-
             File file = new File(path);
             JAXBContext jaxbContext = JAXBContext.newInstance(BridgeConfiguration.class);
 
@@ -50,13 +57,18 @@ public class SimpleBridgeConfigurationLoader implements
             return config;
 
         } catch (JAXBException e) {
-            e.printStackTrace();
+            log.warn(e.toString());
             throw new RuntimeException("Configuration cannot be loaded: " + e);
         }
     }
 
+    /**
+     * @throws RuntimeException if some error has been occurred while saving
+     */
     @Override
     public void saveBridgeConfiguration(BridgeConfiguration config, String path) {
+        ArgumentChecker.checkNull(path);
+        ArgumentChecker.checkNull(config);
         try {
             File file = new File(path);
             JAXBContext jaxbContext = JAXBContext.newInstance(BridgeConfiguration.class, MQTTConfiguration.class);
@@ -67,7 +79,7 @@ public class SimpleBridgeConfigurationLoader implements
             jaxbMarshaller.marshal(config, file);
 
         } catch (JAXBException e) {
-            e.printStackTrace();
+            log.warn(e.toString());
             throw new RuntimeException("Configuration cannot be saved: " + e);
         }
     }

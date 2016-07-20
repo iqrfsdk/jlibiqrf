@@ -17,6 +17,7 @@ package com.microrisc.jlibiqrf.bridge.iqrf;
 
 import com.microrisc.jlibiqrf.IQRFListener;
 import com.microrisc.jlibiqrf.JLibIQRF;
+import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
 import com.microrisc.jlibiqrf.bridge.Bridge;
 import com.microrisc.jlibiqrf.bridge.config.BridgeConfiguration;
 import java.util.Arrays;
@@ -31,22 +32,26 @@ public class IQRFCommunicator implements IQRFListener {
 
     private static final Logger log = LoggerFactory.getLogger(IQRFCommunicator.class);
     
-    private Bridge appLogic;
+    private Bridge bridge;
     private JLibIQRF iqrfLib;
     private CommunicatingThread comThread;
     
     /** Creates instance of {@link IQRFCommunicator}.
      * 
-     * @param logic which will be used for communication
+     * @param bridge which will be used for controlling of communication
      */
-    public IQRFCommunicator(Bridge logic) {
-        appLogic = logic;
+    public IQRFCommunicator(Bridge bridge) {
+        ArgumentChecker.checkNull(bridge);
+        this.bridge = bridge;
     }
 
     /**
      * Init IQRF communicator.
+     * 
+     * @param config containing details about network to connect
      */
     public void init(BridgeConfiguration config) {
+        ArgumentChecker.checkNull(config);
         JLibIQRF iqrf = JLibIQRF.init(config.getIqrfConfig());
         iqrf.addIQRFListener(this);
         iqrfLib = iqrf;
@@ -54,12 +59,16 @@ public class IQRFCommunicator implements IQRFListener {
         comThread.start();
         log.info("IQRFCommunicator init completed and IQRF communication thread started.");
     }
+    
+    public String readCoordinatorMID(){
+        return "unknown";
+    }
 
     @Override
     public void onGetIQRFData(short[] data) {
         log.debug("onGetIQRFData - start: data={}", Arrays.toString(data));
         // send to mqtt
-        appLogic.addIQRFData(data);
+        bridge.addIQRFData(data);
         log.debug("onGetIQRFData - end");
     }
 
@@ -74,9 +83,9 @@ public class IQRFCommunicator implements IQRFListener {
                     return;
                 }
                 
-                if (appLogic.isAvailableMqttMessage()) {
+                if (bridge.isAvailableMqttMessage()) {
                     log.debug("IQRF com thread found available mqtt message. It will be send into IQRF.");
-                    short[] iqrfData = appLogic.getAndRemoveMqttMessage();
+                    short[] iqrfData = bridge.getAndRemoveMqttMessage();
                     iqrfLib.sendData(iqrfData);
                 } else {
                     try {

@@ -16,6 +16,7 @@
 package com.microrisc.jlibiqrf.bridge.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
 
 /**
  *
@@ -46,6 +47,9 @@ final class JsonIQRFData implements IQRFData {
     }
 
     private short[] saveIntToShort(short[] array, int index, int value) {
+        ArgumentChecker.checkNull(array);
+        ArgumentChecker.checkNegative(index);
+        
         array[index] = (short) (value & 0xFF);
         value >>= 8;
         array[index + 1] = (short) (value & 0xFF);

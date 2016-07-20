@@ -16,6 +16,7 @@
 
 package com.microrisc.jlibiqrf.bridge.mqtt;
 
+import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
 import com.microrisc.jlibiqrf.bridge.Bridge;
 import com.microrisc.jlibiqrf.bridge.config.MQTTConfiguration;
 import java.io.ByteArrayInputStream;
@@ -49,6 +50,7 @@ public class MQTTCommunicator implements MqttCallback {
     private final MQTTConfiguration config;
     private MqttConnectOptions conOptions;
     private final Bridge bridge;
+    private final String mid;
     
     private ScheduledExecutorService service = Executors.newScheduledThreadPool(2);
     private ScheduledFuture<?> dataPushServiceHandler;
@@ -58,19 +60,25 @@ public class MQTTCommunicator implements MqttCallback {
     /**
      * Constructs an instance of the sample client wrapper
      *
-     * @param MQTTConfig the configuration params of the server to connect to
+     * @param mqttConfig the configuration params of the server to connect to
      * @param bridge used for communication bridging
      * @throws MqttException
      */
-    public MQTTCommunicator(MQTTConfiguration mqttConfig, Bridge bridge) throws MqttException {
+    public MQTTCommunicator(MQTTConfiguration mqttConfig, Bridge bridge, String mid) throws MqttException {
+        ArgumentChecker.checkNull(mqttConfig);
+        ArgumentChecker.checkNull(bridge);
+        ArgumentChecker.checkNull(mid);
+        
         this.config = mqttConfig;
         this.bridge = bridge;
+        this.mid = mid;
         
     	//This sample stores in a temporary directory... where messages temporarily
         // stored until the message has been delivered to the server.
         //..a real application ought to store them somewhere
         // where they are not likely to get deleted or tampered with
         String tmpDir = System.getProperty("java.io.tmpdir");
+        log.info("As java.io.tmpdir used " + tmpDir);
         MqttDefaultFilePersistence dataStore = new MqttDefaultFilePersistence(tmpDir);
 
         try {
@@ -148,18 +156,25 @@ public class MQTTCommunicator implements MqttCallback {
      * @param checkInterval how often is checking (in ms)
      */
     public void checkAndPublishDeviceData(int checkInterval) {
+        ArgumentChecker.checkNegative(checkInterval);
         Runnable checkAndPushDataRunnable = new Runnable() {
             @Override
             public void run() {
                 if(bridge.isAvailableIQRFData()){
                     log.debug("MQTT com thread found available iqrf data. Data will be send to mqtt broker.");
-                    MqttMessage msg = bridge.getAndRemoveIQRFData();
+                    PublishableMqttMessage msg = bridge.getAndRemoveIQRFData();
                     
-                    System.out.println("msg: " + msg);
                     
                     try {
                         // publish data
-                        publish("coordinator-mid/dpa/responses", 0, msg.getPayload());
+                        if(msg.getType() == DPAReplyType.CONFIRMATION){
+                            publish(mid + "/dpa/confirmations", 0, msg.getPayload());
+                        }else if(msg.getType() == DPAReplyType.RESPONSE){
+                            publish(mid + "/dpa/responses", 0, msg.getPayload());
+                        }else{
+                            log.warn("Unsupported DPA reply type! Message will be published to responses.");
+                            publish(mid + "/dpa/responses", 0, msg.getPayload());
+                        }
                     } catch (MqttException ex) {
                         log.error(ex.getMessage());
                     }
@@ -182,7 +197,10 @@ public class MQTTCommunicator implements MqttCallback {
      * @throws MqttException
      */
     public void publish(String topicName, int qos, byte[] payload) throws MqttException {
-
+        ArgumentChecker.checkNull(topicName);
+        ArgumentChecker.checkInterval(qos, 0, 2);
+        ArgumentChecker.checkNull(payload);
+        
         // Connect to the MQTT server
         //log("Connecting to " + brokerUrl + " with client ID " + client.getClientId());
         //client.connect(conOpt);
@@ -216,6 +234,8 @@ public class MQTTCommunicator implements MqttCallback {
      * @throws MqttException
      */
     public void subscribe(String topicName, int qos) throws MqttException {
+        ArgumentChecker.checkNull(topicName);
+        ArgumentChecker.checkInterval(qos, 0, 2);
         
         // Connect to the MQTT server
         //client.connect(conOpt);
@@ -299,7 +319,8 @@ public class MQTTCommunicator implements MqttCallback {
      * @see MqttCallback#messageArrived(String, MqttMessage)
      */
     public void messageArrived(String topic, MqttMessage message) throws MqttException {
-	
+	ArgumentChecker.checkNull(message);
+        
         // Called when a message arrives from the server that matches any
         // subscription made by the client
         
@@ -336,7 +357,8 @@ public class MQTTCommunicator implements MqttCallback {
      * @return The filled InputStream
      * @exception IOException, if the Streams couldn't be created.
      **/
-    private InputStream fullStream( String fname ) throws IOException {
+    private InputStream fullStream(String fname) throws IOException {
+        ArgumentChecker.checkNull(fname);
         InputStream is = this.getClass().getResourceAsStream(fname);
         //FileInputStream fis = new FileInputStream(fname);
         

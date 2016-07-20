@@ -15,6 +15,7 @@
  */
 package com.microrisc.jlibiqrf.bridge.config;
 
+import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
 import com.microrisc.jlibiqrf.configuration.SimpleIQRFConfigurationLoader;
 import java.text.SimpleDateFormat;
@@ -35,6 +36,7 @@ public class IQRFConfigurationAdapter extends XmlAdapter<String, IQRFConfigurati
     @Override
     public IQRFConfiguration unmarshal(String xmlText) throws Exception {
         log.debug("unmarshal - start: xmlText={}", xmlText);
+        ArgumentChecker.checkNull(xmlText);
         IQRFConfiguration config = SimpleIQRFConfigurationLoader.getInstance().load(xmlText);
         config.setSavingLocation(xmlText);
         log.debug("unmarshal - end: " + config);
@@ -44,6 +46,8 @@ public class IQRFConfigurationAdapter extends XmlAdapter<String, IQRFConfigurati
     @Override
     public String marshal(IQRFConfiguration config) throws Exception {
         log.debug("marshal - start: config={}", config);
+        ArgumentChecker.checkNull(config);
+
         String savingLocation;
         if(config.getSavingLocation() != null)
             savingLocation = config.getSavingLocation();

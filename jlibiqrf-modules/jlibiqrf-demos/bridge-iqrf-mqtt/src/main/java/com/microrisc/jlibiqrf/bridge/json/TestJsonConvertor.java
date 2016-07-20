@@ -15,6 +15,8 @@
  */
 package com.microrisc.jlibiqrf.bridge.json;
 
+import com.microrisc.jlibiqrf.bridge.mqtt.DPAReplyType;
+import com.microrisc.jlibiqrf.bridge.mqtt.PublishableMqttMessage;
 import java.util.Arrays;
 
 /**
@@ -30,8 +32,8 @@ public class TestJsonConvertor implements JsonConvertor {
     }
 
     @Override
-    public Object toJson(short[] iqrf) {
-        return Arrays.toString(iqrf);
+    public PublishableMqttMessage toJson(short[] iqrf) {
+        return new PublishableMqttMessage(DPAReplyType.RESPONSE, Arrays.toString(iqrf).getBytes());
     }
     
     private static TestJsonConvertor instance = new TestJsonConvertor();

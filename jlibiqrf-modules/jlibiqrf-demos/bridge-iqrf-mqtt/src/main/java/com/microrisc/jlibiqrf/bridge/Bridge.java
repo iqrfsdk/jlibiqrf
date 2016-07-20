@@ -17,8 +17,10 @@ package com.microrisc.jlibiqrf.bridge;
 
 import com.microrisc.jlibiqrf.bridge.config.BridgeConfiguration;
 import com.microrisc.jlibiqrf.bridge.iqrf.IQRFCommunicator;
+import com.microrisc.jlibiqrf.bridge.json.JsonConvertor;
 import com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor;
 import com.microrisc.jlibiqrf.bridge.mqtt.MQTTCommunicator;
+import com.microrisc.jlibiqrf.bridge.mqtt.PublishableMqttMessage;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -41,20 +43,33 @@ public class Bridge {
     private final Queue<short[]> iqrfData;
     private final MQTTCommunicator mqttCommunicator;
     private final IQRFCommunicator iqrfCommunicator;
+    private final JsonConvertor convertor;
     
     public Bridge(BridgeConfiguration config){
         log.debug("Bridge - init - start: config={}", config);
+        ArgumentChecker.checkNull(config);
+        
         mqttMessages = new LinkedList<>();
         iqrfData = new LinkedList<>();
         
         iqrfCommunicator = new IQRFCommunicator(this);
         iqrfCommunicator.init(config);
+        String mid = iqrfCommunicator.readCoordinatorMID();
+        log.info("MID of Coordinator is " + mid);
+        try {
+            if(JsonConvertor.class.isAssignableFrom(config.getJsonConvertor())){
+                //TODO check!!!
+                convertor = (JsonConvertor)config.getJsonConvertor().getMethod("getInstance", null).invoke(null, null);
+            }else{
+                throw new IllegalArgumentException("Convertor must be child of JsonConvertor.");
+            }
+        } catch (Exception ex) {
+            throw new IllegalArgumentException(ex);
+        }
         
         try {
-            mqttCommunicator = new MQTTCommunicator(config.getMqttConfig(), this);
-            for (String topic : config.getSubscribedTopics()) {
-                mqttCommunicator.subscribe(topic, 0);
-            }
+            mqttCommunicator = new MQTTCommunicator(config.getMqttConfig(), this, mid);
+            mqttCommunicator.subscribe(mid + "/dpa/requests", 0);
             mqttCommunicator.checkAndPublishDeviceData(config.getCheckingInterval());
         } catch (MqttException ex) {
             log.error(ex.getMessage());
@@ -103,21 +118,12 @@ public class Bridge {
         }
     }
     
-    public MqttMessage getAndRemoveIQRFData() {
+    public PublishableMqttMessage getAndRemoveIQRFData() {
         log.debug("getAndRemoveIQRFData - start");
         synchronized(iqrfData){
             short[] data = iqrfData.poll();
-            Object objMsg = SimpleJsonConvertor.getInstance().toJson(data);
-            if(objMsg instanceof MqttMessage){
-                log.debug("getAndRemoveIQRFData - end: {}", objMsg);
-                return (MqttMessage)objMsg;
-            }else if(objMsg instanceof String){
-                log.debug("getAndRemoveIQRFData - end: {}", objMsg);
-                return new MqttMessage(((String) objMsg).getBytes());
-            }else{
-                log.error("JsonConvertor returned unsupported format of message.");
-                return new MqttMessage(new String(Arrays.toString(data)).getBytes());
-            }
+            PublishableMqttMessage msgToPublish = convertor.toJson(data);
+            return msgToPublish;            
         }
     }
     

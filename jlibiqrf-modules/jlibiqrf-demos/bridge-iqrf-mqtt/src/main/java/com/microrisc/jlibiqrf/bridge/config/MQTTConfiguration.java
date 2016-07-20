@@ -15,6 +15,7 @@
  */
 package com.microrisc.jlibiqrf.bridge.config;
 
+import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
 import java.util.Random;
 import java.util.UUID;
 import javax.xml.bind.annotation.XmlElement;
@@ -130,7 +131,7 @@ public final class MQTTConfiguration {
     
     public static class ConfigurationBuilder {
 
-        private final int DEFAULT_PORT = 0;
+        private final int DEFAULT_PORT = 1883;
         private final String DEFAULT_PROTOCOL = "tcp";
         private final boolean DEFAULT_SSL = false;
         private final boolean DEFAULT_CLEAN_SESSION = true;
@@ -149,6 +150,7 @@ public final class MQTTConfiguration {
         private String password;
         
         public ConfigurationBuilder(String broker){
+            ArgumentChecker.checkNull(broker);
             this.broker = broker;
             Random r = new Random();
             this.clientId = UUID.randomUUID().toString().replace("-", "");
@@ -156,16 +158,19 @@ public final class MQTTConfiguration {
         
         
         public ConfigurationBuilder clientId(String clientId){
+            ArgumentChecker.checkNull(clientId);
             this.clientId = clientId;
             return this;
         }
         
         public ConfigurationBuilder protocol(String protocol){
+            ArgumentChecker.checkNull(protocol);
             this.protocol = protocol;
             return this;
         }
         
         public ConfigurationBuilder port(int port){
+            ArgumentChecker.checkNegative(port);
             this.port = port;
             return this;
         }
@@ -183,6 +188,9 @@ public final class MQTTConfiguration {
         public ConfigurationBuilder ssl(String certFilePath, String username, 
                 String password)
         {
+            ArgumentChecker.checkNull(certFilePath);
+            ArgumentChecker.checkNull(username);
+            ArgumentChecker.checkNull(password);
             this.ssl = true;
             this.certFilePath = certFilePath;
             this.userName = username;

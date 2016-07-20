@@ -15,6 +15,7 @@
  */
 package com.microrisc.jlibiqrf.bridge.config;
 
+import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
 import com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor;
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
 import com.microrisc.jlibiqrf.configuration.SimpleIQRFConfigurationLoader;
@@ -37,8 +38,6 @@ public final class BridgeConfiguration {
     private final MQTTConfiguration mqttConfig;
     @XmlElement(name = "Checking_interval", defaultValue = "1000")
     private final Integer checkingInterval;
-    @XmlElement(name = "Subscribed_topics")
-    private final String[] subscribedTopics;
     @XmlElement(name = "JSON_convertor", defaultValue = "com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor")
     private final Class jsonConvertor;
 
@@ -46,7 +45,6 @@ public final class BridgeConfiguration {
     private BridgeConfiguration(){
         iqrfConfig = null;
         checkingInterval = null;
-        subscribedTopics = null;
         jsonConvertor = null;
         mqttConfig = null;
     }
@@ -55,7 +53,6 @@ public final class BridgeConfiguration {
     private BridgeConfiguration(ConfigurationBuilder builder) {
         this.iqrfConfig = builder.iqrfConfig;
         this.checkingInterval = builder.checkingInterval;
-        this.subscribedTopics = builder.subscribedTopics;
         this.jsonConvertor = builder.jsonConvertor;
         this.mqttConfig = builder.mqttConfig;
     }
@@ -68,10 +65,6 @@ public final class BridgeConfiguration {
         return checkingInterval;
     }
 
-    public String[] getSubscribedTopics() {
-        return subscribedTopics;
-    }
-
     public Class getJsonConvertor() {
         return jsonConvertor;
     }
@@ -82,42 +75,41 @@ public final class BridgeConfiguration {
 
     @Override
     public String toString() {
-        return "BridgeConfiguration{" + "iqrfConfig=" + iqrfConfig + ", mqttConfig=" + mqttConfig + ", checkingInterval=" + checkingInterval + ", subscribedTopics=" + subscribedTopics + ", jsonConvertor=" + jsonConvertor + '}';
+        return "BridgeConfiguration{" + "iqrfConfig=" + iqrfConfig + ", mqttConfig=" + mqttConfig + ", checkingInterval=" + checkingInterval + ", jsonConvertor=" + jsonConvertor + '}';
     }
     
     public static class ConfigurationBuilder {
 
         private final int DEFAULT_CHECKING_INTERVAL = 1000;
-        private final String[] DEFAULT_SUBSCRIBED_TOPICS = new String[]{"unknown/dpa/requests"};
         private final Class DEFAULT_JSON_CONVERTOR = SimpleJsonConvertor.class;
         
         private final IQRFConfiguration iqrfConfig;
         private final MQTTConfiguration mqttConfig;
         private int checkingInterval = DEFAULT_CHECKING_INTERVAL;
-        private String[] subscribedTopics = DEFAULT_SUBSCRIBED_TOPICS;
         private Class jsonConvertor = DEFAULT_JSON_CONVERTOR;
         
         public ConfigurationBuilder(String iqrfConfigPath, MQTTConfiguration mqttConfig){
+            ArgumentChecker.checkNull(iqrfConfigPath);
+            ArgumentChecker.checkNull(mqttConfig);
             this.iqrfConfig = SimpleIQRFConfigurationLoader.getInstance().load(iqrfConfigPath);
             this.mqttConfig = mqttConfig;
         }
         
         public ConfigurationBuilder(IQRFConfiguration config, MQTTConfiguration mqttConfig){
+            ArgumentChecker.checkNull(config);
+            ArgumentChecker.checkNull(mqttConfig);
             this.iqrfConfig = config;
             this.mqttConfig = mqttConfig;
         }
         
         public ConfigurationBuilder checkingInterval(int interval){
+            ArgumentChecker.checkNegative(interval);
             this.checkingInterval = interval;
             return this;
         }
-        
-        public ConfigurationBuilder subscribedTopics(String[] topics){
-            this.subscribedTopics = topics;
-            return this;
-        }
-        
+                
         public ConfigurationBuilder jsonConvertor(Class convertor){
+            ArgumentChecker.checkNull(convertor);
             this.jsonConvertor = convertor;
             return this;
         }
