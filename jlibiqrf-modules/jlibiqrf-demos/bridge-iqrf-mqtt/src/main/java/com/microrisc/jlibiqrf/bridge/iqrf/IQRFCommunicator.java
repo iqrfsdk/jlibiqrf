@@ -21,6 +21,10 @@ import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
 import com.microrisc.jlibiqrf.bridge.Bridge;
 import com.microrisc.jlibiqrf.bridge.config.BridgeConfiguration;
 import java.util.Arrays;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +65,26 @@ public class IQRFCommunicator implements IQRFListener {
     }
     
     public String readCoordinatorMID(){
-        return "unknown";
+        final short[] readOSInfoCmd = new short[]{0x00, 0x00, 0x02, 0x00, 0xFF, 0xFF};        
+        BlockingQueue<String> queue = new LinkedBlockingQueue();
+        MIDRecognizer recognizer = new MIDRecognizer(queue);
+        iqrfLib.addIQRFListener(recognizer);
+        iqrfLib.sendData(readOSInfoCmd);
+        
+        String mid = null;
+        try {
+            mid = queue.poll(10, TimeUnit.SECONDS);
+        } catch (InterruptedException ex) {
+            log.warn(ex.getMessage());
+        }
+        if(mid == null){
+            log.warn("Response from coordinator cannot be processed!");
+            mid = "unknown";
+        }
+        
+        iqrfLib.addIQRFListener(this);
+        
+        return mid;
     }
 
     @Override
