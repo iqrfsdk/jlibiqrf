@@ -11,6 +11,5 @@
         <SSL>false</SSL>
     </MQTT_config>
     <Checking_interval>10000</Checking_interval>
-    <Subscribed_topics>unknown/dpa/requests</Subscribed_topics>
     <JSON_convertor>com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor</JSON_convertor>
 </Bridge_configuration>
