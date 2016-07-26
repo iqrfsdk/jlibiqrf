@@ -109,7 +109,11 @@ public class IQRFCommunicator implements IQRFListener {
                 if (bridge.isAvailableMqttMessage()) {
                     log.debug("IQRF com thread found available mqtt message. It will be send into IQRF.");
                     short[] iqrfData = bridge.getAndRemoveMqttMessage();
-                    iqrfLib.sendData(iqrfData);
+                    if (iqrfData == null) {
+                        log.warn("Data are null. Data won't be send into IQRF network");
+                    } else {
+                        iqrfLib.sendData(iqrfData);
+                    }
                 } else {
                     try {
                         this.sleep(500);

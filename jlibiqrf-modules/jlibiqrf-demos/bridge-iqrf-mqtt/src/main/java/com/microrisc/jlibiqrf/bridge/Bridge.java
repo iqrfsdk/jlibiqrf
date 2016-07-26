@@ -19,6 +19,7 @@ import com.microrisc.jlibiqrf.bridge.config.BridgeConfiguration;
 import com.microrisc.jlibiqrf.bridge.iqrf.IQRFCommunicator;
 import com.microrisc.jlibiqrf.bridge.json.JsonConvertor;
 import com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor;
+import com.microrisc.jlibiqrf.bridge.mqtt.DPAReplyType;
 import com.microrisc.jlibiqrf.bridge.mqtt.MQTTCommunicator;
 import com.microrisc.jlibiqrf.bridge.mqtt.PublishableMqttMessage;
 import java.util.Arrays;
@@ -101,12 +102,19 @@ public class Bridge {
         }
     }
     
+    // returns null if data arent parsed correctly
     public short[] getAndRemoveMqttMessage() {
         log.debug("getAndRemoveMqttMessage - start");
         synchronized(mqttMessages){
             MqttMessage mqttMsg = mqttMessages.poll();
             String msg = new String(mqttMsg.getPayload());
-            short[] result = SimpleJsonConvertor.getInstance().toIQRF(msg);
+            short[] result = null;
+            try{
+                result = SimpleJsonConvertor.getInstance().toIQRF(msg);
+            }catch(IllegalArgumentException ex){
+                log.error("Error while parsing: " + ex.getMessage());
+                // TODO send resonse to server?
+            }
             log.debug("getAndRemoveMqttMessage - end: {}", Arrays.toString(result));
             return result;
         }

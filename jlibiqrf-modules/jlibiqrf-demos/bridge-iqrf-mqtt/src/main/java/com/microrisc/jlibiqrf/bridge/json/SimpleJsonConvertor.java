@@ -18,6 +18,7 @@ package com.microrisc.jlibiqrf.bridge.json;
 import com.microrisc.jlibiqrf.bridge.mqtt.DPAReplyType;
 import com.microrisc.jlibiqrf.bridge.mqtt.PublishableMqttMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
 import java.io.IOException;
@@ -135,13 +136,9 @@ public class SimpleJsonConvertor implements JsonConvertor {
     }
 
     private void parseResponse(ObjectNode parsedData, short[] iqrfData) {
-        StringBuilder builder = new StringBuilder();
+        ArrayNode array = parsedData.putArray("data");
         for (int i = 6; iqrfData != null && i < iqrfData.length; i++) {
-            builder.append(iqrfData[i]);
-            if (i < iqrfData.length - 1) {
-                builder.append(',');
-            }
+            array.add(iqrfData[i]);
         }
-        parsedData.put("data", builder.toString());
     }
 }
