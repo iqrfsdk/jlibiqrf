@@ -39,9 +39,9 @@ public class Bridge {
     private static final Logger log = LoggerFactory.getLogger(Bridge.class);
     
     // queue for messages from MQTT
-    private final Queue<MqttMessage> mqttMessages;
+    private final Queue<short[]> mqttMessages;
     // queue for data from IQRF network
-    private final Queue<short[]> iqrfData;
+    private final Queue<PublishableMqttMessage> iqrfData;
     private final MQTTCommunicator mqttCommunicator;
     private final IQRFCommunicator iqrfCommunicator;
     private final JsonConvertor convertor;
@@ -71,7 +71,7 @@ public class Bridge {
         try {
             mqttCommunicator = new MQTTCommunicator(config.getMqttConfig(), this, mid);
             mqttCommunicator.subscribe(mid + "/dpa/requests", 0);
-            mqttCommunicator.checkAndPublishDeviceData(config.getCheckingInterval());
+            mqttCommunicator.checkAndPublishDeviceData(config.getMQTTCheckingInterval());
         } catch (MqttException ex) {
             log.error(ex.getMessage());
             throw new RuntimeException(ex);
@@ -83,15 +83,23 @@ public class Bridge {
     public void addIQRFData(short[] data) {
         log.debug("addIQRFData - start: data={}", Arrays.toString(data));
         synchronized(iqrfData){
-            iqrfData.add(data);
+            PublishableMqttMessage msgToPublish = convertor.toJson(data);
+            iqrfData.add(msgToPublish);
         }
         log.debug("addIQRFData - end");
     }
 
     public void addMqqtMessage(MqttMessage msg) {
         log.debug("addMqqtMessage - start: msg={}", msg);
-        synchronized(mqttMessages){
-            mqttMessages.add(msg);
+        synchronized(mqttMessages){            
+            String msgContent = new String(msg.getPayload());
+            try{
+                short[] result = SimpleJsonConvertor.getInstance().toIQRF(msgContent);
+                mqttMessages.add(result);
+            }catch(IllegalArgumentException ex){
+                log.error("Error while parsing: " + ex.getMessage());                
+                // TODO send resonse to server?
+            }
         }
         log.debug("addMqqtMessage - end");
     }
@@ -106,15 +114,7 @@ public class Bridge {
     public short[] getAndRemoveMqttMessage() {
         log.debug("getAndRemoveMqttMessage - start");
         synchronized(mqttMessages){
-            MqttMessage mqttMsg = mqttMessages.poll();
-            String msg = new String(mqttMsg.getPayload());
-            short[] result = null;
-            try{
-                result = SimpleJsonConvertor.getInstance().toIQRF(msg);
-            }catch(IllegalArgumentException ex){
-                log.error("Error while parsing: " + ex.getMessage());
-                // TODO send resonse to server?
-            }
+            short[] result = mqttMessages.poll();
             log.debug("getAndRemoveMqttMessage - end: {}", Arrays.toString(result));
             return result;
         }
@@ -129,8 +129,7 @@ public class Bridge {
     public PublishableMqttMessage getAndRemoveIQRFData() {
         log.debug("getAndRemoveIQRFData - start");
         synchronized(iqrfData){
-            short[] data = iqrfData.poll();
-            PublishableMqttMessage msgToPublish = convertor.toJson(data);
+            PublishableMqttMessage msgToPublish = iqrfData.poll();            
             return msgToPublish;            
         }
     }

@@ -37,7 +37,7 @@ public class Configuration {
         MQTTConfiguration mqttConfig = new MQTTConfiguration.ConfigurationBuilder("192.168.154.5").build();
         
         BridgeConfiguration config = new BridgeConfiguration.ConfigurationBuilder(cdcConfig, mqttConfig)
-                .checkingInterval(10000)
+                .mqttCheckingInterval(10000)
                 .build();
         
         System.out.println("before: " + config.toString());

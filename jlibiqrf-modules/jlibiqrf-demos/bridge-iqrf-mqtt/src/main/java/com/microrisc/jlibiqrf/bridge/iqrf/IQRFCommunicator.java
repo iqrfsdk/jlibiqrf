@@ -39,6 +39,7 @@ public class IQRFCommunicator implements IQRFListener {
     private Bridge bridge;
     private JLibIQRF iqrfLib;
     private CommunicatingThread comThread;
+    private int iqrfTimeout;
     
     /** Creates instance of {@link IQRFCommunicator}.
      * 
@@ -56,6 +57,7 @@ public class IQRFCommunicator implements IQRFListener {
      */
     public void init(BridgeConfiguration config) {
         ArgumentChecker.checkNull(config);
+        iqrfTimeout = config.getIQRFCheckingInterval();
         JLibIQRF iqrf = JLibIQRF.init(config.getIqrfConfig());
         iqrf.addIQRFListener(this);
         iqrfLib = iqrf;
@@ -116,7 +118,7 @@ public class IQRFCommunicator implements IQRFListener {
                     }
                 } else {
                     try {
-                        this.sleep(500);
+                        this.sleep(iqrfTimeout);
                     } catch (InterruptedException ex) {
                         System.out.println(ex);
                         return;

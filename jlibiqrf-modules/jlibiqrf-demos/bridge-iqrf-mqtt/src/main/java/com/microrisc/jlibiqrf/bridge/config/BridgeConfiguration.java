@@ -36,15 +36,17 @@ public final class BridgeConfiguration {
     private final IQRFConfiguration iqrfConfig;
     @XmlElement( name = "MQTT_config")
     private final MQTTConfiguration mqttConfig;
-    @XmlElement(name = "Checking_interval", defaultValue = "1000")
-    private final Integer checkingInterval;
+    @XmlElement(name = "MQTT_checking_interval", defaultValue = "1000")
+    private final Integer mqttCheckingInterval;
+    @XmlElement(name = "IQRF_checking_interval", defaultValue = "1")
+    private final Integer iqrfCheckingInterval;
     @XmlElement(name = "JSON_convertor", defaultValue = "com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor")
     private final Class jsonConvertor;
 
     /** For JAXB purpose only */
     private BridgeConfiguration(){
         iqrfConfig = null;
-        checkingInterval = null;
+        mqttCheckingInterval = iqrfCheckingInterval = null;
         jsonConvertor = null;
         mqttConfig = null;
     }
@@ -52,7 +54,8 @@ public final class BridgeConfiguration {
     /** For ConfigurationBuilder only */
     private BridgeConfiguration(ConfigurationBuilder builder) {
         this.iqrfConfig = builder.iqrfConfig;
-        this.checkingInterval = builder.checkingInterval;
+        this.mqttCheckingInterval = builder.mqttCheckingInterval;
+        this.iqrfCheckingInterval = builder.iqrfCheckingInterval;
         this.jsonConvertor = builder.jsonConvertor;
         this.mqttConfig = builder.mqttConfig;
     }
@@ -61,8 +64,12 @@ public final class BridgeConfiguration {
         return iqrfConfig;
     }
 
-    public Integer getCheckingInterval() {
-        return checkingInterval;
+    public Integer getMQTTCheckingInterval() {
+        return mqttCheckingInterval;
+    }
+
+    public Integer getIQRFCheckingInterval() {
+        return mqttCheckingInterval;
     }
 
     public Class getJsonConvertor() {
@@ -75,17 +82,19 @@ public final class BridgeConfiguration {
 
     @Override
     public String toString() {
-        return "BridgeConfiguration{" + "iqrfConfig=" + iqrfConfig + ", mqttConfig=" + mqttConfig + ", checkingInterval=" + checkingInterval + ", jsonConvertor=" + jsonConvertor + '}';
+        return "BridgeConfiguration{" + "iqrfConfig=" + iqrfConfig + ", mqttConfig=" + mqttConfig + ", mqttCheckingInterval=" + mqttCheckingInterval + ", iqrfCheckingInterval=" + iqrfCheckingInterval + ", jsonConvertor=" + jsonConvertor + '}';
     }
     
     public static class ConfigurationBuilder {
 
-        private final int DEFAULT_CHECKING_INTERVAL = 1000;
+        private final int DEFAULT_MQTT_CHECKING_INTERVAL = 1000;
+        private final int DEFAULT_IQRF_CHECKING_INTERVAL = 1;
         private final Class DEFAULT_JSON_CONVERTOR = SimpleJsonConvertor.class;
         
         private final IQRFConfiguration iqrfConfig;
         private final MQTTConfiguration mqttConfig;
-        private int checkingInterval = DEFAULT_CHECKING_INTERVAL;
+        private int mqttCheckingInterval = DEFAULT_MQTT_CHECKING_INTERVAL;
+        private int iqrfCheckingInterval = DEFAULT_IQRF_CHECKING_INTERVAL;
         private Class jsonConvertor = DEFAULT_JSON_CONVERTOR;
         
         public ConfigurationBuilder(String iqrfConfigPath, MQTTConfiguration mqttConfig){
@@ -102,9 +111,15 @@ public final class BridgeConfiguration {
             this.mqttConfig = mqttConfig;
         }
         
-        public ConfigurationBuilder checkingInterval(int interval){
+        public ConfigurationBuilder mqttCheckingInterval(int interval){
             ArgumentChecker.checkNegative(interval);
-            this.checkingInterval = interval;
+            this.mqttCheckingInterval = interval;
+            return this;
+        }
+        
+        public ConfigurationBuilder iqrfCheckingInterval(int interval){
+            ArgumentChecker.checkNegative(interval);
+            this.iqrfCheckingInterval = interval;
             return this;
         }
                 
