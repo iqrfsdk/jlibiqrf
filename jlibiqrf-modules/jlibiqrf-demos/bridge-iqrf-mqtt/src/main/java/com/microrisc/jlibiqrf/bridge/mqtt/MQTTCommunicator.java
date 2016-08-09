@@ -23,6 +23,10 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -50,7 +54,9 @@ public class MQTTCommunicator implements MqttCallback {
     private final MQTTConfiguration config;
     private MqttConnectOptions conOptions;
     private final Bridge bridge;
+    @Deprecated
     private final String mid;
+    private String mac;
     
     private ScheduledExecutorService service = Executors.newScheduledThreadPool(2);
     private ScheduledFuture<?> dataPushServiceHandler;
@@ -72,6 +78,30 @@ public class MQTTCommunicator implements MqttCallback {
         this.config = mqttConfig;
         this.bridge = bridge;
         this.mid = mid;
+        
+        
+        
+        try {
+            InetAddress ip = InetAddress.getLocalHost();
+            NetworkInterface network = NetworkInterface.getByInetAddress(ip);
+
+            byte[] macAddressInBytes = network.getHardwareAddress();
+
+            System.out.print("Current MAC address : ");
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < macAddressInBytes.length; i++) {
+                sb.append(String.format("%02X%s", macAddressInBytes[i], (i < macAddressInBytes.length - 1) ? "-" : ""));
+            }
+            this.mac = sb.toString();
+            System.out.println(sb.toString());
+
+        } catch (UnknownHostException | SocketException ex) {
+            log.error(ex.getMessage());
+            this.mac = "00-00-00-00-00-00";
+        }
+        
+        log.info("Used MAC address " + mac);
         
     	//This sample stores in a temporary directory... where messages temporarily
         // stored until the message has been delivered to the server.
@@ -167,6 +197,8 @@ public class MQTTCommunicator implements MqttCallback {
                     
                     try {
                         // publish data
+                        /*
+                        OLD system dividing msgs into confirmation and response channel
                         if(msg.getType() == DPAReplyType.CONFIRMATION){
                             publish(mid + "/dpa/confirmations", 0, msg.getPayload());
                         }else if(msg.getType() == DPAReplyType.RESPONSE){
@@ -174,7 +206,9 @@ public class MQTTCommunicator implements MqttCallback {
                         }else{
                             log.warn("Unsupported DPA reply type! Message will be published to responses.");
                             publish(mid + "/dpa/responses", 0, msg.getPayload());
-                        }
+                        }*/
+                        
+                        publish("gateway/" + mac + "/rx", 0, msg.getPayload());
                     } catch (MqttException ex) {
                         log.error(ex.getMessage());
                     }
@@ -223,6 +257,22 @@ public class MQTTCommunicator implements MqttCallback {
         //log("Disconnected");
     }
 
+    
+    /**
+     * Subscribe to a topic by MAC address on an MQTT server Once subscribed 
+     * this method waits for the messages to arrive from the server that match 
+     * the subscription.
+     * It continues listening for messages until the enter key is pressed.
+     *
+     * @param qos the maximum quality of service to receive messages at for this
+     * subscription
+     * @throws MqttException
+     */
+    
+    public void subscribe(int qos) throws MqttException {
+        subscribe("gateway/" + mac + "/tx", qos);
+    }
+    
     /**
      * Subscribe to a topic on an MQTT server Once subscribed this method waits
      * for the messages to arrive from the server that match the subscription.

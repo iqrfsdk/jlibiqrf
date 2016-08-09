@@ -10,7 +10,7 @@
         <Quite_mode>false</Quite_mode>
         <SSL>false</SSL>
     </MQTT_config>
-    <MQTTChecking_interval>10</MQTTChecking_interval>
-    <IQRFChecking_interval>10</IQRFChecking_interval>
+    <MQTT_checking_interval>10</MQTT_checking_interval>
+    <IQRF_checking_interval>10</IQRF_checking_interval>
     <JSON_convertor>com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor</JSON_convertor>
 </Bridge_configuration>

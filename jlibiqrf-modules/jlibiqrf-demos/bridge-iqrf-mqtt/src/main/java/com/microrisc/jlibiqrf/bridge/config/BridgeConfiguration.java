@@ -69,7 +69,7 @@ public final class BridgeConfiguration {
     }
 
     public Integer getIQRFCheckingInterval() {
-        return mqttCheckingInterval;
+        return iqrfCheckingInterval;
     }
 
     public Class getJsonConvertor() {

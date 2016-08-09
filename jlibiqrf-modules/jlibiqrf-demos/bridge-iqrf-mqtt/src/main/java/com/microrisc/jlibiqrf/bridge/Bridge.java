@@ -70,7 +70,7 @@ public class Bridge {
         
         try {
             mqttCommunicator = new MQTTCommunicator(config.getMqttConfig(), this, mid);
-            mqttCommunicator.subscribe(mid + "/dpa/requests", 0);
+            mqttCommunicator.subscribe(0);
             mqttCommunicator.checkAndPublishDeviceData(config.getMQTTCheckingInterval());
         } catch (MqttException ex) {
             log.error(ex.getMessage());

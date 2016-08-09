@@ -66,6 +66,7 @@ public class IQRFCommunicator implements IQRFListener {
         log.info("IQRFCommunicator init completed and IQRF communication thread started.");
     }
     
+    @Deprecated
     public String readCoordinatorMID(){
         final short[] readOSInfoCmd = new short[]{0x00, 0x00, 0x02, 0x00, 0xFF, 0xFF};        
         BlockingQueue<String> queue = new LinkedBlockingQueue();

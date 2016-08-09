@@ -3,6 +3,8 @@ import com.microrisc.jlibiqrf.bridge.config.MQTTConfiguration;
 import com.microrisc.jlibiqrf.bridge.config.SimpleBridgeConfigurationLoader;
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
 import com.microrisc.jlibiqrf.iqrfLayer.cdc.CDCConfiguration;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 
 /*
  * Copyright 2016 MICRORISC s.r.o.
