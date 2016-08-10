@@ -17,24 +17,31 @@ package com.microrisc.jlibiqrf.bridge;
 
 import com.microrisc.jlibiqrf.bridge.config.BridgeConfiguration;
 import com.microrisc.jlibiqrf.bridge.config.SimpleBridgeConfigurationLoader;
+import java.io.File;
+
+/**
+ * IQRF gateway bridge app
+ *
+ * @author Martin Strouhal
+ * @author Rostislav Spinar
+ */
 
 public class Boot {
     
     public static void main(String[] args) {
-        BridgeConfiguration config = SimpleBridgeConfigurationLoader.getInstance().load("src/config/config.xml");
-        //BridgeConfiguration config = SimpleBridgeConfigurationLoader.getInstance().load(args[0]);
+        
+        BridgeConfiguration config = SimpleBridgeConfigurationLoader.getInstance().load("config" + File.separator + "config.xml");
         System.out.println("Loaded config: " + config.toString());
         
-        Bridge bridge = new Bridge(config);
+        final Bridge bridge = new Bridge(config);
         System.out.println("Bridge started");
         
-        Runtime.getRuntime().addShutdownHook(new Thread(){
+        Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 System.out.println("Bridge will be canceled.");
                 bridge.destroy();
             }
         });
-    }
-    
+    } 
 }

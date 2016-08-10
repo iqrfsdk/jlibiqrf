@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.microrisc.jlibiqrf.bridge;
 
 import com.microrisc.jlibiqrf.bridge.config.BridgeConfiguration;
 import com.microrisc.jlibiqrf.bridge.iqrf.IQRFCommunicator;
 import com.microrisc.jlibiqrf.bridge.json.JsonConvertor;
 import com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor;
-import com.microrisc.jlibiqrf.bridge.mqtt.DPAReplyType;
 import com.microrisc.jlibiqrf.bridge.mqtt.MQTTCommunicator;
 import com.microrisc.jlibiqrf.bridge.mqtt.PublishableMqttMessage;
 import java.util.Arrays;
@@ -42,11 +42,13 @@ public class Bridge {
     private final Queue<short[]> mqttMessages;
     // queue for data from IQRF network
     private final Queue<PublishableMqttMessage> iqrfData;
+    
     private final MQTTCommunicator mqttCommunicator;
     private final IQRFCommunicator iqrfCommunicator;
     private final JsonConvertor convertor;
     
-    public Bridge(BridgeConfiguration config){
+    public Bridge(BridgeConfiguration config) {
+        
         log.debug("Bridge - init - start: config={}", config);
         ArgumentChecker.checkNull(config);
         
@@ -55,8 +57,10 @@ public class Bridge {
         
         iqrfCommunicator = new IQRFCommunicator(this);
         iqrfCommunicator.init(config);
+        
         String mid = iqrfCommunicator.readCoordinatorMID();
         log.info("MID of Coordinator is " + mid);
+        
         try {
             if(JsonConvertor.class.isAssignableFrom(config.getJsonConvertor())){
                 //TODO check!!!

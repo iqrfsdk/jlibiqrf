@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <cdcConfiguration>
+    <savingLocation>config/cdc-config.xml</savingLocation>
     <communication_type>CDC</communication_type>
-    <savingLocation>src/config/cdc-config.xml</savingLocation>
     <port>COM5</port>
 </cdcConfiguration>

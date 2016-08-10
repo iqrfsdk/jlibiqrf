@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,12 +56,15 @@ public class IQRFCommunicator implements IQRFListener {
      */
     public void init(BridgeConfiguration config) {
         ArgumentChecker.checkNull(config);
+        
         iqrfTimeout = config.getIQRFCheckingInterval();
         JLibIQRF iqrf = JLibIQRF.init(config.getIqrfConfig());
         iqrf.addIQRFListener(this);
         iqrfLib = iqrf;
+        
         comThread = new CommunicatingThread();
         comThread.start();
+        
         log.info("IQRFCommunicator init completed and IQRF communication thread started.");
     }
     

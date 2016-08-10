@@ -77,9 +77,7 @@ public class MQTTCommunicator implements MqttCallback {
         
         this.config = mqttConfig;
         this.bridge = bridge;
-        this.mid = mid;
-        
-        
+        this.mid = mid;   
         
         try {
             InetAddress ip = InetAddress.getLocalHost();

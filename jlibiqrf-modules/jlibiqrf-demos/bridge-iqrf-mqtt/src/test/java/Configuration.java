@@ -3,8 +3,6 @@ import com.microrisc.jlibiqrf.bridge.config.MQTTConfiguration;
 import com.microrisc.jlibiqrf.bridge.config.SimpleBridgeConfigurationLoader;
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
 import com.microrisc.jlibiqrf.iqrfLayer.cdc.CDCConfiguration;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 
 /*
  * Copyright 2016 MICRORISC s.r.o.
@@ -42,20 +40,10 @@ public class Configuration {
                 .mqttCheckingInterval(10000)
                 .build();
         
-        System.out.println("before: " + config.toString());
-        
-        System.out.println("-------------------------------------------------");
-        
-    //      SimpleBridgeConfigurationLoader.getInstance().saveBridgeConfiguration(
-    //            config, "src/config/config.xml");
-
-        System.out.println("-------------------------------------------------");
-        
-        config = SimpleBridgeConfigurationLoader.getInstance().load("src/config/config.xml");
+        System.out.println("before: " + config.toString());        
+        config = SimpleBridgeConfigurationLoader.getInstance().load("config/config.xml");
         System.out.println("after: " + config.toString());
         
         System.out.println(config);
-        
     }
-    
 }

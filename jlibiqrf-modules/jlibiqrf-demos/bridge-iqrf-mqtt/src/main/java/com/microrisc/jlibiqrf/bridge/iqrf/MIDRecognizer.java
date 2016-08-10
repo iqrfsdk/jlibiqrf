@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.microrisc.jlibiqrf.bridge.iqrf;
 
 import com.microrisc.jlibiqrf.IQRFListener;
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author user
+ * @author Martin Strouhal
  */
 class MIDRecognizer implements IQRFListener {
 
@@ -59,6 +60,5 @@ class MIDRecognizer implements IQRFListener {
             finalVal = "0" + finalVal;
         }
         return finalVal;
-    }
-    
+    }    
 }
