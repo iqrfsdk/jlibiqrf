@@ -1,3 +1,5 @@
+
+
 import com.microrisc.jlibiqrf.bridge.config.BridgeConfiguration;
 import com.microrisc.jlibiqrf.bridge.config.MQTTConfiguration;
 import com.microrisc.jlibiqrf.bridge.config.SimpleBridgeConfigurationLoader;
@@ -40,10 +42,11 @@ public class Configuration {
                 .mqttCheckingInterval(10000)
                 .build();
         
-        System.out.println("before: " + config.toString());        
-        config = SimpleBridgeConfigurationLoader.getInstance().load("config/config.xml");
-        System.out.println("after: " + config.toString());
+       SimpleBridgeConfigurationLoader.getInstance().saveBridgeConfiguration(config, "config/createdConf.xml");
         
-        System.out.println(config);
+        System.out.println("loading");
+        BridgeConfiguration loadedConfig = SimpleBridgeConfigurationLoader.getInstance().load("config/config.xml");
+        
+        System.out.println(loadedConfig);
     }
 }

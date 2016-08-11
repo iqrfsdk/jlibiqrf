@@ -47,6 +47,7 @@ public class SimpleBridgeConfigurationLoader implements
      */
     @Override
     public BridgeConfiguration load(String path) {
+        log.debug("load - start: path={}", path);
         ArgumentChecker.checkNull(path);
         try {
             File file = new File(path);
@@ -54,12 +55,13 @@ public class SimpleBridgeConfigurationLoader implements
 
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             BridgeConfiguration config = (BridgeConfiguration) jaxbUnmarshaller.unmarshal(file);
+            
+            log.debug("load - end: " + config);
             return config;
-
         } catch (JAXBException e) {
             log.warn(e.toString());
             throw new RuntimeException("Configuration cannot be loaded: " + e);
-        }
+        }        
     }
 
     /**
@@ -67,6 +69,7 @@ public class SimpleBridgeConfigurationLoader implements
      */
     @Override
     public void saveBridgeConfiguration(BridgeConfiguration config, String path) {
+        log.debug("saveBridgeConfiguration - start: config={}, path={}", config, path);
         ArgumentChecker.checkNull(path);
         ArgumentChecker.checkNull(config);
         try {
@@ -82,5 +85,6 @@ public class SimpleBridgeConfigurationLoader implements
             log.warn(e.toString());
             throw new RuntimeException("Configuration cannot be saved: " + e);
         }
+        log.debug("saveBridgeConfiguration - end");
     }
 }

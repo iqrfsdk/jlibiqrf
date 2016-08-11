@@ -16,6 +16,7 @@
 package com.microrisc.jlibiqrf.bridge.config;
 
 import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
+import com.microrisc.jlibiqrf.bridge.Bridge;
 import com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor;
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
 import com.microrisc.jlibiqrf.configuration.SimpleIQRFConfigurationLoader;
@@ -41,7 +42,7 @@ public final class BridgeConfiguration {
     @XmlElement(name = "IQRF_checking_interval", defaultValue = "1")
     private final Integer iqrfCheckingInterval;
     @XmlElement(name = "JSON_convertor", defaultValue = "com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor")
-    private final Class jsonConvertor;
+    private final String jsonConvertor;
 
     /** For JAXB purpose only */
     private BridgeConfiguration(){
@@ -56,7 +57,7 @@ public final class BridgeConfiguration {
         this.iqrfConfig = builder.iqrfConfig;
         this.mqttCheckingInterval = builder.mqttCheckingInterval;
         this.iqrfCheckingInterval = builder.iqrfCheckingInterval;
-        this.jsonConvertor = builder.jsonConvertor;
+        this.jsonConvertor = builder.jsonConvertor.getName();
         this.mqttConfig = builder.mqttConfig;
     }
 
@@ -73,7 +74,11 @@ public final class BridgeConfiguration {
     }
 
     public Class getJsonConvertor() {
-        return jsonConvertor;
+        try {
+            return Class.forName(jsonConvertor);
+        } catch (ClassNotFoundException ex) {
+            throw new IllegalArgumentException("Badly loaded name of convertor class: " + ex.getMessage());
+        }
     }
 
     public MQTTConfiguration getMqttConfig() {
