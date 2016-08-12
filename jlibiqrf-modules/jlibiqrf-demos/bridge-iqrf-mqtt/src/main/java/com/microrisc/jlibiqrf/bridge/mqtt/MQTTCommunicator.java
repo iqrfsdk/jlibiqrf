@@ -237,7 +237,6 @@ public class MQTTCommunicator implements MqttCallback {
         //client.disconnect();
         //log("Disconnected");
     }
-
     
     /**
      * Subscribe to a topic by MAC address on an MQTT server Once subscribed 
@@ -415,7 +414,7 @@ public class MQTTCommunicator implements MqttCallback {
 
               StringBuilder sb = new StringBuilder();
               for (int i = 0; i < mac.length; i++) {
-                sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? ":" : ""));
+                sb.append(String.format("%02X", mac[i]));
               }
               System.out.println(sb.toString());
               return sb.toString();
@@ -423,8 +422,10 @@ public class MQTTCommunicator implements MqttCallback {
           }
         } catch (UnknownHostException | SocketException e) {
           log.error("Cannot find MAC address! " + e.getMessage());          
+          return "000000000000";
         }
-        return "00:00:00:00:00:00";
+        log.error("Cannot find MAC address!");          
+        return "000000000000";
     }
     
     /** Free-up resources. */
