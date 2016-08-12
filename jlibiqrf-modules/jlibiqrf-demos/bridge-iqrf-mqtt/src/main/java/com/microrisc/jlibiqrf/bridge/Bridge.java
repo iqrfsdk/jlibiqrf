@@ -58,7 +58,7 @@ public class Bridge {
         iqrfCommunicator = new IQRFCommunicator(this);
         iqrfCommunicator.init(config);
         
-        String mid = iqrfCommunicator.readCoordinatorMID();
+        String mid = /*iqrfCommunicator.readCoordinatorMID()*/"unknown";
         log.info("MID of Coordinator is " + mid);
         
         try {

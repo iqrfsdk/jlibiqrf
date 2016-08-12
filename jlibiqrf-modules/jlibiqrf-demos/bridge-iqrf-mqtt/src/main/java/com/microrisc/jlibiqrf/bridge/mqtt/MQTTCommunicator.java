@@ -32,6 +32,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.sql.Timestamp;
+import java.util.Enumeration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -79,25 +80,7 @@ public class MQTTCommunicator implements MqttCallback {
         this.bridge = bridge;
         this.mid = mid;   
         
-        try {
-            InetAddress ip = InetAddress.getLocalHost();
-            NetworkInterface network = NetworkInterface.getByInetAddress(ip);
-
-            byte[] macAddressInBytes = network.getHardwareAddress();
-
-            System.out.print("Current MAC address : ");
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < macAddressInBytes.length; i++) {
-                sb.append(String.format("%02X%s", macAddressInBytes[i], (i < macAddressInBytes.length - 1) ? "-" : ""));
-            }
-            this.mac = sb.toString();
-            System.out.println(sb.toString());
-
-        } catch (UnknownHostException | SocketException ex) {
-            log.error(ex.getMessage());
-            this.mac = "00-00-00-00-00-00";
-        }
+        this.mac = getMAC();
         
         log.info("Used MAC address " + mac);
         
@@ -415,6 +398,33 @@ public class MQTTCommunicator implements MqttCallback {
         dis.readFully(bytes);
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
         return bais;
+    }
+    
+    private String getMAC(){
+        try {
+          InetAddress ip = InetAddress.getLocalHost();
+          log.debug("Current IP address: " + ip.getHostAddress());
+
+          Enumeration<NetworkInterface> networks = NetworkInterface.getNetworkInterfaces();
+          while(networks.hasMoreElements()) {
+            NetworkInterface network = networks.nextElement();
+            byte[] mac = network.getHardwareAddress();
+
+            if(mac != null) {
+              log.debug("Current MAC address: ");
+
+              StringBuilder sb = new StringBuilder();
+              for (int i = 0; i < mac.length; i++) {
+                sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? ":" : ""));
+              }
+              System.out.println(sb.toString());
+              return sb.toString();
+            }
+          }
+        } catch (UnknownHostException | SocketException e) {
+          log.error("Cannot find MAC address! " + e.getMessage());          
+        }
+        return "00:00:00:00:00:00";
     }
     
     /** Free-up resources. */

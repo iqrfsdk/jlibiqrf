@@ -2,4 +2,3 @@
 	-Dlogback.configurationFile=config/logback.xml \
 	-cp bridge-iqrf-mqtt-1.1.0-jar-with-dependencies.jar: \
 	com.microrisc.jlibiqrf.bridge.Boot
-	config/config.xml
