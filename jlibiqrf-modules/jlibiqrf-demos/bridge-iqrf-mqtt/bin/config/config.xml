@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Bridge_configuration>
     <IQRF_config_path>config/cdc-config.xml</IQRF_config_path>
+    
+    <!-- 
+    <IQRF_config_path>config/spi-config.xml</IQRF_config_path>
+    <IQRF_config_path>config/serial-config.xml</IQRF_config_path>
+    <IQRF_config_path>config/udp-config.xml</IQRF_config_path>
+    -->
+    
     <MQTT_config>
         <Protocol>tcp</Protocol>
         <Broker>localhost</Broker>

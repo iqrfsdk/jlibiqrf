@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<serialConfiguration>
+    <communication_type>SERIAL</communication_type>
+    <port>COM5</port>
+    <baudrate>9600</baudrate>
+</serialConfiguration>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<spiConfiguration>
+    <savingLocation>config/spi-config.xml</savingLocation>
+    <communication_type>SPI</communication_type>
+    <port>/dev/spidev0.1</port>
+</spiConfiguration>
