@@ -10,7 +10,7 @@
     
     <MQTT_config>
         <Protocol>tcp</Protocol>
-        <Broker>localhost</Broker>
+        <Broker>192.168.111.130</Broker>
         <Port>1883</Port>
         <Client_id>f384949afd574bdea7563cf4d9bd2936</Client_id>
         <Clean_session>true</Clean_session>

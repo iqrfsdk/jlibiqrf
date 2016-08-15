@@ -82,12 +82,12 @@ public class SimpleJsonConvertor implements JsonConvertor {
         ObjectNode parsedData = mapper.createObjectNode();
         parsedData.put("timestamp", new Timestamp(new Date().getTime()).toString());
         
-        if(iqrfData.length > 6){
+        if(iqrfData.length >= 6){
             parseFoursome(parsedData, iqrfData);
         }else{
             log.warn("Unstandard message!");
             parsedData.put("unparseableData", Arrays.toString(iqrfData));
-            parsedData.put("error", "Doesn|t contains packet information!");
+            parsedData.put("error", "Doesn't contains packet information!");
             log.debug("toJson - end:" + parsedData.toString());
             return new PublishableMqttMessage(DPAReplyType.ERROR, parsedData.toString().getBytes());
         }

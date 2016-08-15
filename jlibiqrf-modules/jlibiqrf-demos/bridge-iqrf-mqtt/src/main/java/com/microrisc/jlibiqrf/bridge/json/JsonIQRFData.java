@@ -15,6 +15,7 @@
  */
 package com.microrisc.jlibiqrf.bridge.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
 
@@ -22,6 +23,7 @@ import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
  *
  * @author Martin Strouhal
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 final class JsonIQRFData implements IQRFData {
 
     @JsonProperty("nadr")
