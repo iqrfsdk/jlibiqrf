@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
+import com.microrisc.jlibiqrf.types.IQRFData;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -55,15 +56,15 @@ public class SimpleJsonConvertor implements JsonConvertor {
      * @throws IllegalArgumentException if data cannot be converted
      */
     @Override
-    public short[] toIQRF(Object json) {
+    public IQRFData toIQRF(Object json) {
         log.debug("toIQRF - start: json={}", json);
         ArgumentChecker.checkNull(json);
         if (json instanceof String) {
             String jsonString = (String) json;
             try {
                 JsonIQRFData data = mapper.readValue(jsonString, JsonIQRFData.class);
-                log.debug("toIQRF - end: {}", Arrays.toString(data.getIQRFData()));
-                return data.getIQRFData();
+                log.debug("toIQRF - end: {}", data);
+                return data;
             } catch (IOException ex) {
                 log.warn("Invalid Json data: " + ex.getMessage());
                 throw new IllegalArgumentException("Invalid Json data");

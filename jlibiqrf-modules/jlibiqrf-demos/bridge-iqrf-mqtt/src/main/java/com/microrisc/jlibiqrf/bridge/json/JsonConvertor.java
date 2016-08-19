@@ -16,6 +16,7 @@
 package com.microrisc.jlibiqrf.bridge.json;
 
 import com.microrisc.jlibiqrf.bridge.mqtt.PublishableMqttMessage;
+import com.microrisc.jlibiqrf.types.IQRFData;
 
 /**
  * Provides converting IQRF data to json and vice versa.
@@ -27,10 +28,10 @@ public interface JsonConvertor {
     /** Converts string with json data to IQRF data which can be send into IQRF.
      * network.
      *
-     * @param json object is with data formatted as json
-     * @return short array with individual bytes of IQRF data
+     * @param json object are data formatted as json
+     * @return {@link IQRFData} with individual bytes of IQRF data
      */
-    short[] toIQRF(Object json);
+    IQRFData toIQRF(Object json);
 
     /**
      * Converts IQRF data from IQRF network into message with json data. The

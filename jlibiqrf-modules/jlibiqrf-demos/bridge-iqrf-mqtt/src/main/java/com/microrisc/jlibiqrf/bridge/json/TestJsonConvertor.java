@@ -17,6 +17,7 @@ package com.microrisc.jlibiqrf.bridge.json;
 
 import com.microrisc.jlibiqrf.bridge.mqtt.DPAReplyType;
 import com.microrisc.jlibiqrf.bridge.mqtt.PublishableMqttMessage;
+import com.microrisc.jlibiqrf.types.IQRFData;
 import java.util.Arrays;
 
 /**
@@ -27,8 +28,13 @@ import java.util.Arrays;
 public class TestJsonConvertor implements JsonConvertor {
     
     @Override
-    public short[] toIQRF(Object json) {
-        return new short[]{0x00, 0x00, 0x06, 0x01, 0xFF, 0xFF};
+    public IQRFData toIQRF(Object json) {
+        return new IQRFData() {
+            @Override
+            public short[] getData() {
+                return new short[]{0x00, 0x00, 0x06, 0x01, 0xFF, 0xFF};
+            }
+        };
     }
 
     @Override

@@ -98,7 +98,7 @@ public class Bridge {
         synchronized(mqttMessages){            
             String msgContent = new String(msg.getPayload());
             try{
-                short[] result = SimpleJsonConvertor.getInstance().toIQRF(msgContent);
+                short[] result = SimpleJsonConvertor.getInstance().toIQRF(msgContent).getData();
                 mqttMessages.add(result);
             }catch(IllegalArgumentException ex){
                 log.error("Error while parsing: " + ex.getMessage());                

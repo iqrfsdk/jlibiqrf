@@ -127,7 +127,7 @@ public final class UDPIQRFLayer extends AbstractIQRFLayer {
                     }
                     newDataReceived = true;
                 } catch (SocketTimeoutException ex) {
-                    logger.debug("Timeout expired");
+                    logger.trace("Timeout expired");
                 } catch (IOException ex) {
                     logger.error("Error while receiving message from socket", ex);
                 }

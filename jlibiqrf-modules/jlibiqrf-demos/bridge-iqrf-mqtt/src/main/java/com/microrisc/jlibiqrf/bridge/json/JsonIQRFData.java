@@ -18,6 +18,7 @@ package com.microrisc.jlibiqrf.bridge.json;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
+import com.microrisc.jlibiqrf.types.IQRFData;
 
 /**
  *
@@ -38,7 +39,7 @@ final class JsonIQRFData implements IQRFData {
     private short[] data;
 
     @Override
-    public short[] getIQRFData() {
+    public short[] getData() {
         short[] result = new short[6 + data.length];
         result = saveIntToShort(result, 0, address);
         result[2] = peripheral;
