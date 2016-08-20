@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Bridge_configuration>
     <IQRF_config_path>config/cdc-config.xml</IQRF_config_path>
-    
+
     <!-- 
     <IQRF_config_path>config/spi-config.xml</IQRF_config_path>
     <IQRF_config_path>config/serial-config.xml</IQRF_config_path>
@@ -10,7 +10,7 @@
     
     <MQTT_config>
         <Protocol>tcp</Protocol>
-        <Broker>localhost</Broker>
+        <Broker>192.168.111.130</Broker>
         <Port>1883</Port>
         <Client_id>f384949afd574bdea7563cf4d9bd2936</Client_id>
         <Clean_session>true</Clean_session>
@@ -19,5 +19,5 @@
     </MQTT_config>
     <MQTT_checking_interval>10</MQTT_checking_interval>
     <IQRF_checking_interval>10</IQRF_checking_interval>
-    <JSON_convertor>com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor</JSON_convertor>
+    <JSON_convertor>com.microrisc.jlibiqrf.bridge.json.ComplexJsonConvertor</JSON_convertor>
 </Bridge_configuration>

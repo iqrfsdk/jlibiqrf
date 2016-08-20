@@ -18,21 +18,17 @@ package com.microrisc.jlibiqrf.bridge.mqtt;
 
 import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
 import com.microrisc.jlibiqrf.bridge.Bridge;
+import com.microrisc.jlibiqrf.bridge.MACRecognizer;
 import com.microrisc.jlibiqrf.bridge.config.MQTTConfiguration;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.sql.Timestamp;
-import java.util.Enumeration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -80,7 +76,7 @@ public class MQTTCommunicator implements MqttCallback {
         this.bridge = bridge;
         this.mid = mid;   
         
-        this.mac = getMAC();
+        this.mac = MACRecognizer.getMAC();
         
         log.info("Used MAC address " + mac);
         
@@ -398,36 +394,7 @@ public class MQTTCommunicator implements MqttCallback {
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
         return bais;
     }
-    
-    private String getMAC(){
-        try {
-          InetAddress ip = InetAddress.getLocalHost();
-          log.debug("Current IP address: " + ip.getHostAddress());
-
-          Enumeration<NetworkInterface> networks = NetworkInterface.getNetworkInterfaces();
-          while(networks.hasMoreElements()) {
-            NetworkInterface network = networks.nextElement();
-            byte[] mac = network.getHardwareAddress();
-
-            if(mac != null) {
-              log.debug("Current MAC address: ");
-
-              StringBuilder sb = new StringBuilder();
-              for (int i = 0; i < mac.length; i++) {
-                sb.append(String.format("%02X", mac[i]));
-              }
-              System.out.println(sb.toString());
-              return sb.toString();
-            }
-          }
-        } catch (UnknownHostException | SocketException e) {
-          log.error("Cannot find MAC address! " + e.getMessage());          
-          return "000000000000";
-        }
-        log.error("Cannot find MAC address!");          
-        return "000000000000";
-    }
-    
+        
     /** Free-up resources. */
     public void destroy(){
         if(!dataPushServiceHandler.isCancelled()) {
