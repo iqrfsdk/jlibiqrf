@@ -213,7 +213,7 @@ public final class UDPIQRFLayer extends AbstractIQRFLayer {
                 // remove data from queue and put send it to listener
                 while (!consumedData.isEmpty()) {
                     short[] packetData = consumedData.poll();
-
+                    
                     if (iqrfListener == null) {
                         continue;
                     }
@@ -231,7 +231,7 @@ public final class UDPIQRFLayer extends AbstractIQRFLayer {
                         continue;
                     }
 
-                    if (iqrfListener != null) {
+                    if (iqrfListener != null && isAsync) {
                         iqrfListener.onGetIQRFData(userData);
                     }
                 }

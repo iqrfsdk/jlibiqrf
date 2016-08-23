@@ -19,6 +19,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microrisc.jlibiqrf.types.IQRFData;
 import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -27,6 +29,7 @@ import java.util.Arrays;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ComplexIQRFData implements IQRFData {
 
+    private Logger log = LoggerFactory.getLogger(ComplexIQRFData.class);
     
     private short[] payload;    
     @JsonProperty("dpa")
@@ -48,6 +51,7 @@ public class ComplexIQRFData implements IQRFData {
 
     @JsonProperty("phyPayload")
     public void setPayload(String payloadString) {
+        log.debug("setPayload - start: payloadString={}", payloadString);
         String[] splittedArray = payloadString.split("\\.");
         payload = new short[splittedArray.length];
         for (int i = 0; i < splittedArray.length; i++) {            
@@ -60,10 +64,12 @@ public class ComplexIQRFData implements IQRFData {
                 throw new IllegalArgumentException("Illegal json data. Size isn't correct.");
             }
         }
+        log.debug("setPayload - end");
     }
     
     @JsonProperty("size")
     public void setSize(int size) {
+        log.debug("setSize - start: size={}", size);
         if(payload == null){
             this.size = size;
         }else{
@@ -71,7 +77,7 @@ public class ComplexIQRFData implements IQRFData {
                 throw new IllegalArgumentException("Illegal json data. Size isn't correct.");
             }
         }
-        
+        log.debug("setSize - end");
     }
 
     @Override
