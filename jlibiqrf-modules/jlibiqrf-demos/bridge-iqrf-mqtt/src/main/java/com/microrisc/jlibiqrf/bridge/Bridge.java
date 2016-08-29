@@ -19,7 +19,6 @@ package com.microrisc.jlibiqrf.bridge;
 import com.microrisc.jlibiqrf.bridge.config.BridgeConfiguration;
 import com.microrisc.jlibiqrf.bridge.iqrf.IQRFCommunicator;
 import com.microrisc.jlibiqrf.bridge.json.JsonConvertor;
-import com.microrisc.jlibiqrf.bridge.json.SimpleJsonConvertor;
 import com.microrisc.jlibiqrf.bridge.mqtt.MQTTCommunicator;
 import com.microrisc.jlibiqrf.bridge.mqtt.PublishableMqttMessage;
 import java.util.Arrays;
@@ -31,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Provides main functionality for bridging data. There is implemented mechanism 
+ * for safe thread adding and removing of data.
  *
  * @author Martin Strouhal
  */
@@ -47,6 +48,11 @@ public class Bridge {
     private final IQRFCommunicator iqrfCommunicator;
     private final JsonConvertor convertor;
     
+    /**
+     * Inits {@link Bridge} with specified configuration.
+     * 
+     * @param config which will be used for initialization
+     */
     public Bridge(BridgeConfiguration config) {
         
         log.debug("Bridge - init - start: config={}", config);
@@ -58,12 +64,12 @@ public class Bridge {
         iqrfCommunicator = new IQRFCommunicator(this);
         iqrfCommunicator.init(config);
         
+        // in previous versions used commented code
         String mid = /*iqrfCommunicator.readCoordinatorMID()*/"unknown";
         log.info("MID of Coordinator is " + mid);
         
         try {
             if(JsonConvertor.class.isAssignableFrom(config.getJsonConvertor())){
-                //TODO check!!!
                 convertor = (JsonConvertor)config.getJsonConvertor().getMethod("getInstance", null).invoke(null, null);
             }else{
                 throw new IllegalArgumentException("Convertor must be child of JsonConvertor.");
@@ -84,6 +90,11 @@ public class Bridge {
         log.debug("Bridge - init - end");
     }
 
+    /**
+     * Adds iqrf data to bridging and converts it to correct format before can 
+     * be added to queue to mqtt publish.
+     * @param data to add
+     */
     public void addIQRFData(short[] data) {
         log.debug("addIQRFData - start: data={}", Arrays.toString(data));
         synchronized(iqrfData){
@@ -93,6 +104,11 @@ public class Bridge {
         log.debug("addIQRFData - end");
     }
 
+    /**
+     * Adds received message to bridging and converts it to correct format 
+     * before can be added to queue to iqrf sending.
+     * @param msg received message
+     */    
     public void addMqqtMessage(MqttMessage msg) {
         log.debug("addMqqtMessage - start: msg={}", msg);
         synchronized(mqttMessages){            
@@ -108,13 +124,22 @@ public class Bridge {
         log.debug("addMqqtMessage - end");
     }
 
+    /**
+     * Returns availability of mqtt data.
+     * @return true, if are data available
+     */
     public boolean isAvailableMqttMessage(){
         synchronized(mqttMessages){
             return !mqttMessages.isEmpty();
         }
     }
     
-    // returns null if data arent parsed correctly
+    /**
+     * Gets and removes mqtt data from bridge. For checking of data availability 
+     * use {@link Bridge#isAvailableMQTTData() }
+     * @return mqtt data converted as short array or null in case, that data 
+     * cannot be parsed
+     */
     public short[] getAndRemoveMqttMessage() {
         log.debug("getAndRemoveMqttMessage - start");
         synchronized(mqttMessages){
@@ -124,12 +149,21 @@ public class Bridge {
         }
     }
 
+    /**
+     * Returns availability of iqrf data.
+     * @return true, if are data available
+     */
     public boolean isAvailableIQRFData(){
         synchronized(iqrfData){
             return !iqrfData.isEmpty();
         }
     }
     
+    /**
+     * Gets and removes iqrf data from bridge. For checking of data availability 
+     * use {@link Bridge#isAvailableIQRFData() }
+     * @return iqrf data converted as {@link PublishableMqttMessage}
+     */
     public PublishableMqttMessage getAndRemoveIQRFData() {
         log.debug("getAndRemoveIQRFData - start");
         synchronized(iqrfData){
@@ -138,6 +172,9 @@ public class Bridge {
         }
     }
     
+    /**
+     * Free up resources.
+     */
     public void destroy(){
         iqrfCommunicator.destroy();
         mqttCommunicator.destroy();

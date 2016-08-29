@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.microrisc.jlibiqrf.bridge.json;
 
-import com.microrisc.jlibiqrf.bridge.mqtt.DPAReplyType;
-import com.microrisc.jlibiqrf.bridge.mqtt.PublishableMqttMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
+import com.microrisc.jlibiqrf.bridge.MACRecognizer;
+import com.microrisc.jlibiqrf.bridge.mqtt.DPAReplyType;
+import com.microrisc.jlibiqrf.bridge.mqtt.PublishableMqttMessage;
 import com.microrisc.jlibiqrf.types.IQRFData;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -32,17 +31,21 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides convert services between iqrf data (short[]) and json data (String).
- * 
+ *
  * @author Martin Strouhal
  */
 public class SimpleJsonConvertor implements JsonConvertor {
 
     private static final Logger log = LoggerFactory.getLogger(SimpleJsonConvertor.class);
+    
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final SimpleJsonConvertor instance = new SimpleJsonConvertor();
+    private final String mac;
     
     /** Singleton */
-    private SimpleJsonConvertor(){}
+    private SimpleJsonConvertor(){
+        this.mac = MACRecognizer.getMAC();
+    }
     
     /** Returns instance of convertor
      * 
@@ -51,7 +54,7 @@ public class SimpleJsonConvertor implements JsonConvertor {
     public static SimpleJsonConvertor getInstance(){
         return instance;
     }
-
+    
     /**
      * @throws IllegalArgumentException if data cannot be converted
      */
@@ -62,7 +65,7 @@ public class SimpleJsonConvertor implements JsonConvertor {
         if (json instanceof String) {
             String jsonString = (String) json;
             try {
-                JsonIQRFData data = mapper.readValue(jsonString, JsonIQRFData.class);
+                ComplexIQRFData data = mapper.readValue(jsonString, ComplexIQRFData.class);
                 log.debug("toIQRF - end: {}", data);
                 return data;
             } catch (IOException ex) {
@@ -73,74 +76,28 @@ public class SimpleJsonConvertor implements JsonConvertor {
             log.warn("Json object must be instance of String");
             throw new IllegalArgumentException("Json object must be instance of String");
         }
+
     }
 
     @Override
-    public PublishableMqttMessage toJson(short[] iqrfData) {
-        log.debug("toJson - start: iqrfData={}", Arrays.toString(iqrfData));
-        ArgumentChecker.checkNull(iqrfData);
+    public PublishableMqttMessage toJson(short[] iqrf) {
+        log.debug("toJson - start: iqrf={}", Arrays.toString(iqrf));
+        ArgumentChecker.checkNull(iqrf);
         
         ObjectNode parsedData = mapper.createObjectNode();
-        parsedData.put("timestamp", new Timestamp(new Date().getTime()).toString());
-        
-        if(iqrfData.length >= 6){
-            parseFoursome(parsedData, iqrfData);
-        }else{
-            log.warn("Unstandard message!");
-            parsedData.put("unparseableData", Arrays.toString(iqrfData));
-            parsedData.put("error", "Doesn't contains packet information!");
-            log.debug("toJson - end:" + parsedData.toString());
-            return new PublishableMqttMessage(DPAReplyType.ERROR, parsedData.toString().getBytes());
+        parsedData.put("time", new Timestamp(new Date().getTime()).toString());
+        parsedData.put("timestamp", System.currentTimeMillis());
+                
+        StringBuilder payloadBuilder = new StringBuilder();
+        for (int i = 0; i <iqrf.length; i++, payloadBuilder.append(".")) {
+            payloadBuilder.append(iqrf[i]);
         }
+        parsedData.put("payload", payloadBuilder.toString());
         
-        if(iqrfData.length > 7 && iqrfData[6] == 0xFF){    
-            if (iqrfData.length == 11) {
-                parseConfirmation(parsedData, iqrfData);
-                log.debug("toJson - end:" + parsedData.toString());
-                return new PublishableMqttMessage(DPAReplyType.CONFIRMATION, parsedData.toString().getBytes());
-            }else{
-                log.warn("Unstandard message!");
-                parsedData.put("unparseableData", Arrays.toString(iqrfData));
-                parsedData.put("error", "Invalid confirmation!");
-                log.debug("toJson - end:" + parsedData.toString());
-                return new PublishableMqttMessage(DPAReplyType.ERROR, parsedData.toString().getBytes());
-            }
-        }else{
-            parseResponse(parsedData, iqrfData);
-            log.debug("toJson - end:" + parsedData.toString());
-            return new PublishableMqttMessage(DPAReplyType.RESPONSE, parsedData.toString().getBytes());   
-        }                                        
-    }
-    
-    /**
-     * Returns int value of two element from array on specified index. Eg. for
-     * elements 255 and 0 is returned 0xF0.
-     */
-    private int getTwoShortAsInt(short[] array, int index){
-        int value = array[index+1];
-        value <<=8;
-        value += array[index];
-        return value;
-    }
-
-    private void parseFoursome(ObjectNode parsedData, short[] iqrfData) {
-        parsedData.put("nadr", getTwoShortAsInt(iqrfData, 0));
-        parsedData.put("per", iqrfData[2]);
-        parsedData.put("cmd", iqrfData[3]);
-        parsedData.put("hwpid", getTwoShortAsInt(iqrfData, 4));
-    }
-
-    private void parseConfirmation(ObjectNode parsedData, short[] iqrfData) {
-        parsedData.put("dpaValue", iqrfData[7]);
-        parsedData.put("hops", iqrfData[8]);
-        parsedData.put("timeslotLength", iqrfData[9]);
-        parsedData.put("hopsResponse", iqrfData[10]);
-    }
-
-    private void parseResponse(ObjectNode parsedData, short[] iqrfData) {
-        ArrayNode array = parsedData.putArray("data");
-        for (int i = 6; iqrfData != null && i < iqrfData.length; i++) {
-            array.add(iqrfData[i]);
-        }
+        parsedData.put("mac", mac);
+        parsedData.put("size", iqrf.length);
+        
+        log.debug("toJson - end:" + parsedData.toString());
+        return new PublishableMqttMessage(DPAReplyType.RESPONSE, parsedData.toString().getBytes());                                                   
     }
 }
