@@ -49,10 +49,13 @@ public final class MQTTConfiguration {
     private final String userName;
     @XmlElement(name = "Password")
     private final String password;
+    @XmlElement(name = "Topic_prefix")
+    private final String topicPrefix;
 
     /** For JAXB purpose only */
     private MQTTConfiguration(){
         protocol = broker = clientId = certFilePath = userName = password = null;
+        topicPrefix = "";
         port = 0;
         cleanSession = quiteMode = ssl = false;
     }
@@ -69,6 +72,7 @@ public final class MQTTConfiguration {
         this.certFilePath = builder.certFilePath;
         this.userName = builder.userName;
         this.password = builder.password;
+        this.topicPrefix = builder.topicPrefix;
     }
 
     public String getProtocol() {
@@ -119,6 +123,10 @@ public final class MQTTConfiguration {
         }
         return password;
     }
+
+    public String getTopicPrefix() {
+        return topicPrefix + ((topicPrefix == "" || topicPrefix == null ) ? "" : '/');
+    }
     
     public String getCompleteAddress(){
         return protocol + "://" + broker + ":" + port;
@@ -126,7 +134,7 @@ public final class MQTTConfiguration {
 
     @Override
     public String toString() {
-        return "MQTTConfiguration{" + "broker=" + getCompleteAddress() + ", clientId=" + clientId + ", cleanSession=" + cleanSession + ", quiteMode=" + quiteMode + ", ssl=" + ssl + ", certFilePath=" + certFilePath + ", userName=" + userName + ", password=" + password + '}';
+        return "MQTTConfiguration{" + "broker=" + getCompleteAddress() + ", clientId=" + clientId + ", cleanSession=" + cleanSession + ", quiteMode=" + quiteMode + ", ssl=" + ssl + ", certFilePath=" + certFilePath + ", userName=" + userName + ", password=" + password + ", topicPrefix=" + topicPrefix + '}';
     }
     
     public static class ConfigurationBuilder {
@@ -136,7 +144,7 @@ public final class MQTTConfiguration {
         private final boolean DEFAULT_SSL = false;
         private final boolean DEFAULT_CLEAN_SESSION = true;
         private final boolean DEFAULT_QUITE_MODE = false;
-        
+        private final String DEFAULT_TOPIC_PREFIX = "";
         
         private String protocol = DEFAULT_PROTOCOL;
         private final String broker;
@@ -148,6 +156,7 @@ public final class MQTTConfiguration {
         private String certFilePath;
         private String userName;
         private String password;
+        private String topicPrefix = DEFAULT_TOPIC_PREFIX;
         
         public ConfigurationBuilder(String broker){
             ArgumentChecker.checkNull(broker);
@@ -195,6 +204,11 @@ public final class MQTTConfiguration {
             this.certFilePath = certFilePath;
             this.userName = username;
             this.password = password;
+            return this;
+        }
+        
+        public ConfigurationBuilder topicPrefix(String topicPrefix){
+            this.topicPrefix = topicPrefix;
             return this;
         }
         

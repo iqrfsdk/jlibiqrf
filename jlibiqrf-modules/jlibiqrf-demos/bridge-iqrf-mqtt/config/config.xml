@@ -16,6 +16,7 @@
         <Clean_session>true</Clean_session>
         <Quite_mode>false</Quite_mode>
         <SSL>false</SSL>
+        <Topic_prefix>ROOT</Topic_prefix>
     </MQTT_config>
     <MQTT_checking_interval>10</MQTT_checking_interval>
     <IQRF_checking_interval>10</IQRF_checking_interval>

@@ -62,7 +62,7 @@ public class DPAJsonConvertor implements JsonConvertor {
         if (json instanceof String) {
             String jsonString = (String) json;
             try {
-                JsonIQRFData data = mapper.readValue(jsonString, JsonIQRFData.class);
+                DPAIQRFData data = mapper.readValue(jsonString, DPAIQRFData.class);
                 log.debug("toIQRF - end: {}", data);
                 return data;
             } catch (IOException ex) {

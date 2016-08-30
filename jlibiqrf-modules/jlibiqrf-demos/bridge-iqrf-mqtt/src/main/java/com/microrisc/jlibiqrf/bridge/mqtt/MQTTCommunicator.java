@@ -185,7 +185,7 @@ public class MQTTCommunicator implements MqttCallback {
                             publish(mid + "/dpa/responses", 0, msg.getPayload());
                         }*/
                         
-                        publish("gateway/" + mac + "/rx", 0, msg.getPayload());
+                        publish(config.getTopicPrefix() + "gateway/" + mac + "/rx", 0, msg.getPayload());
                     } catch (MqttException ex) {
                         log.error(ex.getMessage());
                     }
@@ -246,7 +246,7 @@ public class MQTTCommunicator implements MqttCallback {
      */
     
     public void subscribe(int qos) throws MqttException {
-        subscribe("gateway/" + mac + "/tx", qos);
+        subscribe(config.getTopicPrefix() + "gateway/" + mac + "/tx", qos);
     }
     
     /**

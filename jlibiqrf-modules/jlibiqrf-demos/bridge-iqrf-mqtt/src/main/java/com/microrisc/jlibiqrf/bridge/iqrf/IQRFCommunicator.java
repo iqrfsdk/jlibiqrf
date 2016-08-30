@@ -28,14 +28,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ *  Provides main managment and manage services for data bridging.
+ * 
  * @author Martin Strouhal
  */
 public class IQRFCommunicator implements IQRFListener {
 
     private static final Logger log = LoggerFactory.getLogger(IQRFCommunicator.class);
     
-    private Bridge bridge;
+    private final Bridge bridge;
     private JLibIQRF iqrfLib;
     private CommunicatingThread comThread;
     private int iqrfTimeout;
