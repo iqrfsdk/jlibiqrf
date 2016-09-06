@@ -89,10 +89,13 @@ public class SimpleJsonConvertor implements JsonConvertor {
         parsedData.put("timestamp", System.currentTimeMillis());
                 
         StringBuilder payloadBuilder = new StringBuilder();
-        for (int i = 0; i <iqrf.length; i++, payloadBuilder.append(".")) {
-            payloadBuilder.append(iqrf[i]);
+        for (int i = 0; i < iqrf.length; i++) {
+            payloadBuilder.append(String.format("%02x", iqrf[i]));
+            if(i < iqrf.length-1){
+                payloadBuilder.append(".");
+            }
         }
-        parsedData.put("payload", payloadBuilder.toString());
+        parsedData.put("payload", payloadBuilder.toString().toUpperCase());
         
         parsedData.put("mac", mac);
         parsedData.put("size", iqrf.length);

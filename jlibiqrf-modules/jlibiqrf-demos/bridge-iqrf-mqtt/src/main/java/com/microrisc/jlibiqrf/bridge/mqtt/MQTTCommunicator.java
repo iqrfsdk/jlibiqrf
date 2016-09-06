@@ -33,7 +33,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import org.eclipse.paho.client.mqttv3.*;
@@ -64,8 +63,6 @@ public class MQTTCommunicator implements MqttCallback {
     private Runnable reconnectionRunnable = new Runnable() {
         @Override
         public void run() {
-            // tadydydydaaaa        
-            
             while(client != null && !client.isConnected()){            
                 // Connect to the MQTT server
                 log("Reconnecting to " + config.getCompleteAddress() + " with client ID " + client.getClientId());
@@ -86,8 +83,7 @@ public class MQTTCommunicator implements MqttCallback {
                 }
             }
             reconnectionThread = null;
-            log("Connected");
-        
+            log("Connected");        
         }
     };
     private Thread reconnectionThread;
