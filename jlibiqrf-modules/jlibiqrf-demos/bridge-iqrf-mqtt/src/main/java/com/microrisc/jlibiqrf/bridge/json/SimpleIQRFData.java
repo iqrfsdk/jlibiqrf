@@ -23,13 +23,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ *  Data usable for {@link SimpleJsonConvertor}.
+ * 
  * @author Martin Strouhal
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ComplexIQRFData implements IQRFData {
+public class SimpleIQRFData implements IQRFData {
 
-    private Logger log = LoggerFactory.getLogger(ComplexIQRFData.class);
+    private Logger log = LoggerFactory.getLogger(SimpleIQRFData.class);
     
     private short[] payload;    
     @JsonProperty("dpa")

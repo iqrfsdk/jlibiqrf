@@ -65,7 +65,7 @@ public class SimpleJsonConvertor implements JsonConvertor {
         if (json instanceof String) {
             String jsonString = (String) json;
             try {
-                ComplexIQRFData data = mapper.readValue(jsonString, ComplexIQRFData.class);
+                SimpleIQRFData data = mapper.readValue(jsonString, SimpleIQRFData.class);
                 log.debug("toIQRF - end: {}", data);
                 return data;
             } catch (IOException ex) {
@@ -85,8 +85,6 @@ public class SimpleJsonConvertor implements JsonConvertor {
         ArgumentChecker.checkNull(iqrf);
         
         ObjectNode parsedData = mapper.createObjectNode();
-        parsedData.put("time", new Timestamp(new Date().getTime()).toString());
-        parsedData.put("timestamp", System.currentTimeMillis());
                 
         StringBuilder payloadBuilder = new StringBuilder();
         for (int i = 0; i < iqrf.length; i++) {
@@ -95,10 +93,12 @@ public class SimpleJsonConvertor implements JsonConvertor {
                 payloadBuilder.append(".");
             }
         }
-        parsedData.put("payload", payloadBuilder.toString().toUpperCase());
-        
-        parsedData.put("mac", mac);
+        parsedData.put("phyPayload", payloadBuilder.toString().toUpperCase());
         parsedData.put("size", iqrf.length);
+        parsedData.put("mac", mac);        
+        parsedData.put("time", new Timestamp(new Date().getTime()).toString());
+        parsedData.put("timestamp", System.currentTimeMillis());
+
         
         log.debug("toJson - end:" + parsedData.toString());
         return new PublishableMqttMessage(DPAReplyType.RESPONSE, parsedData.toString().getBytes());                                                   
