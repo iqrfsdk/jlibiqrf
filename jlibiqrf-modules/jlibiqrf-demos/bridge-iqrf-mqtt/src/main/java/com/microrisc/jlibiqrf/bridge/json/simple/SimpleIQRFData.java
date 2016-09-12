@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.microrisc.jlibiqrf.bridge.json;
+package com.microrisc.jlibiqrf.bridge.json.simple;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -50,7 +50,7 @@ public class SimpleIQRFData implements IQRFData {
         return payload;
     }     
 
-    @JsonProperty("phyPayload")
+    @JsonProperty("payload")
     public void setPayload(String payloadString) {
         log.debug("setPayload - start: payloadString={}", payloadString);
         String[] splittedArray = payloadString.split("\\.");

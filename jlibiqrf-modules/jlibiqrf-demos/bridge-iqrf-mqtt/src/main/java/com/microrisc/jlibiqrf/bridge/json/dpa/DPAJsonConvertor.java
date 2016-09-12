@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.microrisc.jlibiqrf.bridge.json;
+package com.microrisc.jlibiqrf.bridge.json.dpa;
 
 import com.microrisc.jlibiqrf.bridge.mqtt.DPAReplyType;
 import com.microrisc.jlibiqrf.bridge.mqtt.PublishableMqttMessage;
@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
+import com.microrisc.jlibiqrf.bridge.json.JsonConvertor;
 import com.microrisc.jlibiqrf.types.IQRFData;
 import java.io.IOException;
 import java.sql.Timestamp;

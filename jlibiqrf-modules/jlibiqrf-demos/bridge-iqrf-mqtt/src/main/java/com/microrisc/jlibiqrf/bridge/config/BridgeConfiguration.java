@@ -17,7 +17,7 @@ package com.microrisc.jlibiqrf.bridge.config;
 
 import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
 import com.microrisc.jlibiqrf.bridge.Bridge;
-import com.microrisc.jlibiqrf.bridge.json.DPAJsonConvertor;
+import com.microrisc.jlibiqrf.bridge.json.simple.SimpleJsonConvertor;
 import com.microrisc.jlibiqrf.configuration.IQRFConfiguration;
 import com.microrisc.jlibiqrf.configuration.SimpleIQRFConfigurationLoader;
 import javax.xml.bind.annotation.XmlElement;
@@ -94,7 +94,7 @@ public final class BridgeConfiguration {
 
         private final int DEFAULT_MQTT_CHECKING_INTERVAL = 1000;
         private final int DEFAULT_IQRF_CHECKING_INTERVAL = 1;
-        private final Class DEFAULT_JSON_CONVERTOR = DPAJsonConvertor.class;
+        private final Class DEFAULT_JSON_CONVERTOR = SimpleJsonConvertor.class;
         
         private final IQRFConfiguration iqrfConfig;
         private final MQTTConfiguration mqttConfig;

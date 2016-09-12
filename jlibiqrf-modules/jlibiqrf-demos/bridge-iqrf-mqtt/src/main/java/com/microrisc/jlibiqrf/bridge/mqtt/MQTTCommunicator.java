@@ -33,6 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import org.eclipse.paho.client.mqttv3.*;
@@ -54,6 +55,7 @@ public class MQTTCommunicator implements MqttCallback {
     @Deprecated
     private final String mid;
     private String mac;
+    private String statsTopicName;
     
     private ScheduledExecutorService service = Executors.newScheduledThreadPool(2);
     private ScheduledFuture<?> dataPushServiceHandler;
@@ -107,6 +109,7 @@ public class MQTTCommunicator implements MqttCallback {
         this.mid = mid;   
         
         this.mac = MACRecognizer.getMAC();
+        this.statsTopicName = config.getTopicPrefix() + "gateway/" + mac + "/stats";
         
         log.info("Used MAC address " + mac);
         
@@ -274,9 +277,9 @@ public class MQTTCommunicator implements MqttCallback {
      * subscription
      * @throws MqttException
      */
-    
-    public void subscribe(int qos) throws MqttException {
+    public void subscribeBridgeDefault(int qos) throws MqttException {
         subscribe(config.getTopicPrefix() + "gateway/" + mac + "/tx", qos);
+        subscribe(config.getTopicPrefix() + "gateway/" + mac + "/stats", qos);
     }
     
     /**
@@ -284,7 +287,7 @@ public class MQTTCommunicator implements MqttCallback {
      * for the messages to arrive from the server that match the subscription.
      * It continues listening for messages until the enter key is pressed.
      *
-     * @param topicName to subscribe to (can be wild carded)
+     * @param topicName to subscribeBridgeDefault to (can be wild carded)
      * @param qos the maximum quality of service to receive messages at for this
      * subscription
      * @throws MqttException
@@ -340,6 +343,7 @@ public class MQTTCommunicator implements MqttCallback {
     /**
      * @see MqttCallback#deliveryComplete(IMqttDeliveryToken)
      */
+    @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
         
         // Called when a message has been delivered to the
@@ -361,38 +365,31 @@ public class MQTTCommunicator implements MqttCallback {
     }
 
     /**
+     * @throws org.eclipse.paho.client.mqttv3.MqttException
      * @see MqttCallback#messageArrived(String, MqttMessage)
      */
+    @Override
     public void messageArrived(String topic, MqttMessage message) throws MqttException {
 	ArgumentChecker.checkNull(message);
         
         // Called when a message arrives from the server that matches any
         // subscription made by the client
         
-        String time = new Timestamp(System.currentTimeMillis()).toString();
-        System.out.println("Time:\t" + time
-                           + "  Topic:\t" + topic
-                           + "  Message:\t" + new String(message.getPayload())
-                           + "  QoS:\t" + message.getQos());
-        
-        // get data as string
-        final String msg = new String(message.getPayload());
-        
-        //String resultToBeSent = null;
-        //resultToBeSent = OpenGateway.sendDPAWebRequest(topic, msg);
+        if(topic.compareTo(statsTopicName) == 0){            
+                sendStatistics();
+        }else{
+            String time = new Timestamp(System.currentTimeMillis()).toString();
+            System.out.println("Time:\t" + time
+                               + "  Topic:\t" + topic
+                               + "  Message:\t" + new String(message.getPayload())
+                               + "  QoS:\t" + message.getQos());
 
-        bridge.addMqqtMessage(message);
+            bridge.addMqqtMessage(message);
 
-        log.info("Message: '" + new String(message.getPayload())
-                + "' published to internal DPA Queue with topic [" + topic + "]");
-
-/*
-        if(resultToBeSent != null) {
-            publish(Topics.ACTUATORS_RESPONSES_LEDS, 2, resultToBeSent.getBytes());
+            log.info("Message: '" + new String(message.getPayload())
+                    + "' published to internal DPA Queue with topic [" + topic + "]");
         }
-*/
-        
-    }
+    }    
     
     /**
      * <p>Creates an InputStream from a file, and fills it with the complete
@@ -413,7 +410,16 @@ public class MQTTCommunicator implements MqttCallback {
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
         return bais;
     }
-        
+
+    private void sendStatistics(){
+        String stats = bridge.getStatistics().getAsJson();
+        try {
+            publish(statsTopicName, 0, stats.getBytes());
+        } catch (MqttException ex) {
+            log.warn("Statistics sending was unsuccessful: " + ex);
+        }
+    }
+    
     /** Free-up resources. */
     public void destroy(){
         if(!dataPushServiceHandler.isCancelled()) {

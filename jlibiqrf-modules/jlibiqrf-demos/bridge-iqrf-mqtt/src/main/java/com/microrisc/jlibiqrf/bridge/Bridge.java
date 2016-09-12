@@ -43,7 +43,7 @@ public class Bridge {
     private final Queue<short[]> mqttMessages;
     // queue for data from IQRF network
     private final Queue<PublishableMqttMessage> iqrfData;
-    
+    private final Statistics statistics;
     private final MQTTCommunicator mqttCommunicator;
     private final IQRFCommunicator iqrfCommunicator;
     private final JsonConvertor convertor;
@@ -80,12 +80,14 @@ public class Bridge {
         
         try {
             mqttCommunicator = new MQTTCommunicator(config.getMqttConfig(), this, mid);
-            mqttCommunicator.subscribe(0);
+            mqttCommunicator.subscribeBridgeDefault(0);
             mqttCommunicator.checkAndPublishDeviceData(config.getMQTTCheckingInterval());
         } catch (MqttException ex) {
             log.error(ex.getMessage());
             throw new RuntimeException(ex);
         }
+        
+        statistics = new Statistics();
         
         log.debug("Bridge - init - end");
     }
@@ -121,6 +123,7 @@ public class Bridge {
                 // TODO send resonse to server?
             }
         }
+        statistics.increaseReceivedMessages();
         log.debug("addMqqtMessage - end");
     }
 
@@ -168,8 +171,13 @@ public class Bridge {
         log.debug("getAndRemoveIQRFData - start");
         synchronized(iqrfData){
             PublishableMqttMessage msgToPublish = iqrfData.poll();            
+            statistics.increaseSentMessages();
             return msgToPublish;            
         }
+    }
+
+    public Statistics getStatistics() {
+        return statistics;
     }
     
     /**
