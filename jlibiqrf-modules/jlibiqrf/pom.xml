@@ -12,20 +12,25 @@
             <artifactId>jlibcdc</artifactId>
             <version>1.1.0-SNAPSHOT</version>
         </dependency>
+<dependency>
+            <groupId>com.microrisc.rpi.io</groupId>
+            <artifactId>jlibrpi-io</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
-            <groupId>com.microrisc.rpi</groupId>
+            <groupId>com.microrisc.rpi.spi</groupId>
             <artifactId>jlibrpi-spi</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.microrisc.rpi</groupId>
+            <groupId>com.microrisc.rpi.spi.iqrf</groupId>
             <artifactId>jlibrpi-spi-iqrf</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.microrisc</groupId>
+            <groupId>com.microrisc.hdlcframing.v2</groupId>
             <artifactId>hdlc-framing-v2</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.scream3r</groupId>
