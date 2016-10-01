@@ -59,7 +59,10 @@ public class IQRFConfigurationAdapter extends XmlAdapter<String, IQRFConfigurati
         log.debug("marshal - end: " + savingLocation);
         return savingLocation;    
     }
-    
+
+    /**
+     * Generates random config name by actual date and time.
+     */
     private String getConfigName(){
         SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS");
         String time = timeFormat.format(System.currentTimeMillis());

@@ -23,7 +23,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- *
+ * Provides services for statistics recording and their converting to printable 
+ * format.
+ * 
  * @author Martin Strouhal
  */
  @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE) 
@@ -35,16 +37,22 @@ public class Statistics {
     private int sentMessages = 0;
     @JsonProperty("mac")
     private final String mac = MACRecognizer.getMAC();    
-    
+   
+    /** Record a new received message and increase counter. */
     public void increaseReceivedMessages(){
         receivedMessages++;
     }
     
+    /** Record a new sent message and increase counter. */
     public void increaseSentMessages(){
         sentMessages++;
     }    
-
-    @JsonUnwrapped
+    
+    /**
+     * Returns statistics as json in String.
+     * @return json as string
+     */
+    @JsonUnwrapped    
     public String getAsJson(){
         ObjectMapper mapper = new ObjectMapper();
         try {

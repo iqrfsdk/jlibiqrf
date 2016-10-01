@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *  Provides main managment and manage services for data bridging.
+ * Provides main management and manage services for data bridging.
  * 
  * @author Martin Strouhal
  */

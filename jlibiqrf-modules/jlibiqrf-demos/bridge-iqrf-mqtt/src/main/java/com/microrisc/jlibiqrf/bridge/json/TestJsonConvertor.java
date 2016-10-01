@@ -21,7 +21,8 @@ import com.microrisc.jlibiqrf.types.IQRFData;
 import java.util.Arrays;
 
 /**
- * For testing purpose only!
+ * For testing purpose only! Generating testing data instead of response from 
+ * real LED diode.
  * 
  * @author Martin Strouhal
  */

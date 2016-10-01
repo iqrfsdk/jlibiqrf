@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides convert services between iqrf data (short[]) and json data (String).
+ * See the description on github wiki: https://github.com/iqrfsdk/jlibiqrf/wiki/SimpleJsonConvertor
  *
  * @author Martin Strouhal
  */

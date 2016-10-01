@@ -16,6 +16,8 @@
 package com.microrisc.jlibiqrf.bridge.json.simple;
 
 /**
+ * Helps identify data from IQRF network and holds information about it,
+ * especially about DPA.
  *
  * @author Martin Strouhal
  */
@@ -24,15 +26,30 @@ public class DPAAddon {
     private final boolean dpa;
     private final int number;
 
+    /** 
+     * Creates instance of {@link DPAAddon} with specified number and dpa 
+     * identification.
+     * @param dpa is true if it's used DPA protocol
+     * @param number of packet (each next packet should have increased this 
+     * number)
+     */
     public DPAAddon(boolean dpa, int number) {
         this.dpa = dpa;
         this.number = number;
     }
 
+    /**
+     * Returns true if it's used dpa protocol
+     * @return if it's used dpa protocol
+     */
     public boolean isDPA() {
         return dpa;
     }
 
+    /**
+     * Returns number of packet, see details in constructor.
+     * @return number of packet
+     */
     public int getNumber() {
         return number;
     }    

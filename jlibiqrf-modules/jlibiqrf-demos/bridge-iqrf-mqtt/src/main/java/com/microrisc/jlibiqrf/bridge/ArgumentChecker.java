@@ -17,6 +17,13 @@
 package com.microrisc.jlibiqrf.bridge;
 
 /**
+ * Provides advanced functionality for checking input data in parameters via
+ * static methods. In case of illegal data is {@link IllegalArgumentException}
+ * thrown. Interfaces provides advanced logging like using variable names of
+ * checked data - each method has overloaded method which ever call second
+ * method with string parameter in which can be defined variable name of checked
+ * data. In case, that it is used function without string name, is used
+ * internally only word "Value".
  *
  * @author Martin Strouhal
  */

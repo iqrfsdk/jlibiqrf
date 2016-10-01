@@ -23,7 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * This implementation of {@link IQRFListener} implements service which is 
+ * listening incoming data and from it identify MID of coordinator. If it's MID
+ * recognized, it pulled to queue specified in constructor.
+ * 
  * @author Martin Strouhal
  */
 class MIDRecognizer implements IQRFListener {
@@ -31,10 +34,16 @@ class MIDRecognizer implements IQRFListener {
     private final static Logger log = LoggerFactory.getLogger(MIDRecognizer.class);
     private final BlockingQueue queue;
     
+    /**
+     * Creates instance of {@link MIDRecognizer}. Recognized MID is pulled into
+     * queue.
+     * @param queue into which will be pulled recognized MID
+     */
     public MIDRecognizer(BlockingQueue queue) {
         this.queue = queue;
     }
     
+    // listen and recognize if data contains MID
     @Override
     public void onGetIQRFData(short[] shorts) {
         log.debug("onGetIQRFData - start: " + Arrays.toString(shorts));
@@ -54,6 +63,12 @@ class MIDRecognizer implements IQRFListener {
         log.debug("onGetIQRFData - end");
     }
     
+    /**
+     * Converts number to hex string formated to two char places, so each string 
+     * contains 2 hex symbols.
+     * @param number to convert
+     * @return double place hex string
+     */
     private String getDoublePlaceHex(short number){
         String finalVal = Integer.toHexString(number);
         if(finalVal.length() == 1){

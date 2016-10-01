@@ -20,7 +20,8 @@ import com.microrisc.jlibiqrf.bridge.config.SimpleBridgeConfigurationLoader;
 import java.io.File;
 
 /**
- * IQRF gateway bridge app
+ * IQRF gateway bridge app. Starts the app with configuration placed in
+ * config/config.xml. Application is terminable via Ctrl + C.
  *
  * @author Martin Strouhal
  * @author Rostislav Spinar

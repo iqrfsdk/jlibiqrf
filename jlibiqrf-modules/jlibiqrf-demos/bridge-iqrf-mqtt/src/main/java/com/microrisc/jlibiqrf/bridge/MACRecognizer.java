@@ -24,13 +24,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Provides funcionality of recognizing MAC address of NIC in device.
+ * 
  * @author Martin Strouhal
  */
 public class MACRecognizer {
 
     private static final Logger log = LoggerFactory.getLogger(MACRecognizer.class);
     
+    /**
+     * Returns mac address.
+     * @return mac address as string (without double-dots)
+     */
     public static String getMAC() {
         try {
             InetAddress ip = InetAddress.getLocalHost();

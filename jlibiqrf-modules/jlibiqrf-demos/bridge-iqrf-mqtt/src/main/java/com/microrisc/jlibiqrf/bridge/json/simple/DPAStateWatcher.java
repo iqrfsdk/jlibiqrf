@@ -19,7 +19,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- *
+ * Provides functionality for watching {@link DPAAddon}. It requires very exact 
+ * watching, in other case can mechanisms stand not working and there isn't 
+ * functionality for preventation before this state.
+ * 
  * @author Martin Strouhal
  */
 public class DPAStateWatcher {
@@ -27,10 +30,24 @@ public class DPAStateWatcher {
     private final Queue<DPAAddon> dpaAddons = new LinkedList<>();
     private DPAAddon lastDPAAddon = new DPAAddon(false, -1);
 
+    /** 
+     * Add to queue {@link DPAAddon} which will be returned after previous DPA 
+     * addons.
+     * @param addon to add
+     */
     public void addDPAAddon(DPAAddon addon) {
         dpaAddons.add(addon);
     }
 
+    /**
+     * Returns {@link DPAAddon} which should be for required purpose (in case
+     * correct using). Otherwise can stand watching mechanism not working.
+     * <br><b>Note:</b> When isn't in queue any addon, is returned last
+     * previously returned addon. If any addon doesn't exist, it is returned
+     * default addon - see declaration of {@link DPAStateWatcher#lastDPAAddon}
+     *
+     * @return {@link DPAAddon}
+     */
     public DPAAddon getDPAAddon() {
         DPAAddon addon = dpaAddons.poll();
         if (addon == null) {

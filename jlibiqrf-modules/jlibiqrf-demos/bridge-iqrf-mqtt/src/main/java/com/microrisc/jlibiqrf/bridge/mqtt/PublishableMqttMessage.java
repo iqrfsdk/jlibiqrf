@@ -19,19 +19,30 @@ import com.microrisc.jlibiqrf.bridge.ArgumentChecker;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**
- *
+ * Mqtt message which can be published to mqtt broker. Hold information about
+ * data and type of data. See {@link DPAReplyType}.
+ * 
  * @author Martin Strouhal
  */
 public class PublishableMqttMessage extends MqttMessage {
     
      private final DPAReplyType type;
 
+     /**
+      * Creates a publishable mqtt message with specified data and type
+      * @param type of message, see {@link DPAReplyType}
+      * @param payload data of message
+      */
     public PublishableMqttMessage(DPAReplyType type, byte[] payload) {
         super(payload);
         ArgumentChecker.checkNull(type);
         this.type = type;
     }
 
+    /**
+     * Returns type of message.
+     * @return {@link DPAReplyType}.
+     */
     public DPAReplyType getType() {
         return type;
     }

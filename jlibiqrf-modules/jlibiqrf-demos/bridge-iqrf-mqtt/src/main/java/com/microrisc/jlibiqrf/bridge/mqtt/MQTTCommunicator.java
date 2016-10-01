@@ -33,7 +33,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import org.eclipse.paho.client.mqttv3.*;
@@ -42,8 +41,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * MQTT wrapper implementation customized for using in Bridge.
+ * 
  * @author Rostislav Spinar
+ * @author Martin Strouhal
  */
 public class MQTTCommunicator implements MqttCallback {
 
@@ -93,11 +94,11 @@ public class MQTTCommunicator implements MqttCallback {
     private static final Logger log = LoggerFactory.getLogger(MQTTCommunicator.class);
 
     /**
-     * Constructs an instance of the sample client wrapper
+     * Constructs an instance of the client wrapper
      *
      * @param mqttConfig the configuration params of the server to connect to
      * @param bridge used for communication bridging
-     * @throws MqttException
+     * @throws MqttException if some error has been occurred
      */
     public MQTTCommunicator(MQTTConfiguration mqttConfig, Bridge bridge, String mid) throws MqttException {
         ArgumentChecker.checkNull(mqttConfig);
@@ -113,10 +114,7 @@ public class MQTTCommunicator implements MqttCallback {
         
         log.info("Used MAC address " + mac);
         
-    	//This sample stores in a temporary directory... where messages temporarily
-        // stored until the message has been delivered to the server.
-        //..a real application ought to store them somewhere
-        // where they are not likely to get deleted or tampered with
+    	// in this tmpDir are messages temporarily stored until the message has been delivered to the server.
         String tmpDir = System.getProperty("java.io.tmpdir");
         log.info("As java.io.tmpdir used " + tmpDir);
         MqttDefaultFilePersistence dataStore = new MqttDefaultFilePersistence(tmpDir);
@@ -245,11 +243,6 @@ public class MQTTCommunicator implements MqttCallback {
         ArgumentChecker.checkInterval(qos, 0, 2);
         ArgumentChecker.checkNull(payload);
         
-        // Connect to the MQTT server
-        //log("Connecting to " + brokerUrl + " with client ID " + client.getClientId());
-        //client.connect(conOpt);
-        //log("Connected");
-
         String time = new Timestamp(System.currentTimeMillis()).toString();
         log("Publishing at: " + time + " to topic \"" + topicName + "\" qos " + qos);
 
@@ -261,10 +254,6 @@ public class MQTTCommunicator implements MqttCallback {
         // it has been delivered to the server meeting the specified
         // quality of service.
         client.publish(topicName, message);
-
-        // Disconnect the client
-        //client.disconnect();
-        //log("Disconnected");
     }
     
     /**
@@ -307,10 +296,6 @@ public class MQTTCommunicator implements MqttCallback {
         // will be received at the same level they were published at.
         log("Subscribing to topic \"" + topicName + "\" qos " + qos);
         client.subscribe(topicName, qos);
-
-        // Disconnect the client from the server
-        //client.disconnect();
-        //log("Disconnected");
     }
 
     /**

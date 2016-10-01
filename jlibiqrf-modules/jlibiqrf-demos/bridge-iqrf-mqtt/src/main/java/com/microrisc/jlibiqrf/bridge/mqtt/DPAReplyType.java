@@ -16,7 +16,8 @@
 package com.microrisc.jlibiqrf.bridge.mqtt;
 
 /**
- *
+ * Identify type of DPA response.
+ * 
  * @author Martin Strouhal
  */
 public enum DPAReplyType {
