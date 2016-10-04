@@ -2,5 +2,5 @@
 <spiConfiguration>
     <savingLocation>config/spi-config.xml</savingLocation>
     <communication_type>SPI</communication_type>
-    <port>/dev/spidev0.1</port>
+    <port>/dev/spidev0.0</port>
 </spiConfiguration>
